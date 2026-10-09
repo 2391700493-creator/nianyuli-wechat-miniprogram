@@ -1,0 +1,26 @@
+@import "records-filter.wxss";
+.records-page { display: flex; flex-direction: column; height: 100vh; min-height: 0; padding-top: 20rpx; padding-bottom: calc(124rpx + env(safe-area-inset-bottom)); overflow: hidden; }
+.records-scroll { flex: 1; height: 0; min-height: 0; }
+.list-summary { flex: none; display: flex; justify-content: space-between; align-items: center; min-height: 88rpx; gap: 12rpx; color: #78726b; font-size: 24rpx; }
+.reset-filters { min-height: 88rpx; display: flex; align-items: center; color: #55514c; font-size: 24rpx; }
+.record-list { position: relative; }
+.record-row { position: relative; }
+.record-row::before { content: ''; position: absolute; left: 13rpx; top: 0; bottom: 0; width: 3rpx; background: #dcd8d2; }
+.record-row:first-child::before { top: 29rpx; }
+.record-row-last::before { bottom: auto; height: 29rpx; }
+.record-row:first-child.record-row-last::before { height: 0; }
+.record-date { padding: 0 0 12rpx; font-size: 27rpx; font-weight: 600; color: #55514c; }
+.record-entry { position: relative; display: flex; align-items: flex-start; width: 100%; text-align: left; padding: 18rpx 0 24rpx; gap: 26rpx; }
+.record-entry:active { opacity: .65; }
+.entry-marker { position: relative; flex: none; width: 28rpx; height: 28rpx; margin-top: 6rpx; border: 4rpx solid #292724; border-radius: 50%; background: #f2f0ed; }
+.entry-content { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.record-divider { height: 1rpx; margin: 0 0 24rpx 54rpx; background: #e2ded8; }
+.event-text { font-size: 30rpx; line-height: 1.6; }
+.event-meta { margin-top: 12rpx; }
+.person-link { color: #64615c; font-size: 25rpx; line-height: 1.5; }
+.event-tags { margin-top: 8rpx; color: #78726b; font-size: 24rpx; line-height: 1.5; }
+.record-button { flex: none; margin-top: 16rpx; min-height: 88rpx; padding: 24rpx; border-radius: 20rpx; background: #1d1d1f; color: #fff; }
+.more-button { width: 100%; padding: 26rpx; color: #55514c; font-size: 26rpx; }
+.list-end { padding: 32rpx 0; text-align: center; color: #8c857c; font-size: 22rpx; }
+.empty-note { margin-top: 12rpx; font-size: 24rpx; }
+.empty-reset { margin: 24rpx auto 0; padding: 20rpx; color: #1d1d1f; font-size: 26rpx; }

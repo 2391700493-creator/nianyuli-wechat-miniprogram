@@ -1,0 +1,41 @@
+<view class="person-page">
+  <view wx:if="{{loading}}" class="empty page-status">加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="empty page-status">加载失败，请检查网络。<button hover-class="button-pressed" class="retry" bindtap="retryLoad">重试</button></view>
+  <block wx:else>
+    <view class="profile-hero matte-black">
+      <view class="profile">
+        <button hover-class="button-pressed" class="avatar-upload" bindtap="chooseAvatar" aria-label="上传人物照片">
+          <image wx:if="{{person.avatarUrl}}" class="avatar-lg" src="{{person.avatarUrl}}" mode="aspectFill"/>
+          <view wx:else class="avatar-lg">{{person.avatar || person.name}}</view>
+        </button>
+        <view class="profile-copy"><view class="profile-name">{{person.name}}</view><view wx:if="{{person.note}}" class="profile-note">{{person.note}}</view></view>
+        <button hover-class="button-pressed" class="profile-edit" bindtap="editPerson">编辑资料</button>
+      </view>
+      <view wx:if="{{basics.length}}" class="profile-basics"><text wx:for="{{basics}}" wx:key="label">{{item.label}} {{item.value}}</text></view>
+      <view class="profile-stats">
+        <view class="stat"><text class="stat-number">{{totalCount}}</text><text>条记录</text></view>
+        <view class="stat-divider"></view>
+        <view class="last-stat"><text class="stat-number">{{lastNumber}}</text><view><text>{{lastUnit}}</text><view class="stat-caption">最近记录</view></view></view>
+      </view>
+    </view>
+    <view class="person-sheet">
+      <view class="section-head"><view class="section-title">相处记录</view><text class="record-count">{{activeTags.length ? events.length : totalCount}}条</text></view>
+      <scroll-view wx:if="{{tags.length}}" class="tag-scroll" scroll-x enable-flex show-scrollbar="{{false}}"><view class="tag-list">
+        <button hover-class="button-pressed" class="tag {{!activeTags.length ? 'selected' : ''}}" bindtap="clearTags">全部</button>
+        <button hover-class="button-pressed" wx:for="{{tags}}" wx:key="name" class="tag {{item.selected ? 'selected' : ''}}" data-tag="{{item.name}}" bindtap="filterTag">{{item.name}}</button>
+      </view></scroll-view>
+      <scroll-view class="records-scroll" scroll-y scroll-top="{{scrollTop}}" show-scrollbar="{{false}}">
+      <view wx:if="{{!events.length}}" class="empty">{{activeTags.length ? '没有符合所选条件的记录。' : '还没有相关记录，记下第一件事吧。'}}</view>
+      <view wx:else class="person-timeline">
+        <view wx:for="{{events}}" wx:key="id" class="record-row"><view class="record-dot" style="{{item.moodColor ? 'background:' + item.moodColor + ';border-color:' + item.moodColor : ''}}"></view>
+          <button class="event" data-id="{{item.id}}" bindtap="openEvent" hover-class="event-pressed">
+            <view class="event-top"><text class="event-date">{{item.dateLabel}}</text></view>
+            <text class="event-text">{{item.text}}</text><text wx:if="{{item.tagsText}}" class="event-tags-line">{{item.tagsText}}</text>
+          </button>
+        </view>
+      </view>
+      </scroll-view>
+      <view class="person-footer"><button hover-class="button-pressed" class="record-button matte-black" bindtap="record">记一件事</button><view class="secondary-actions"><button hover-class="button-pressed" class="delete-person" disabled="{{deleting}}" bindtap="deletePerson">{{deleting ? '删除中…' : '删除该人物'}}</button></view></view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,21 @@
+.DS_Store
+node_modules/
+miniprogram_npm/
+project.private.config.json
+design-reference/.file-versions/
+design-reference/.od-frames/
+design-reference/.od-skills/
+design-reference/*.artifact.json
+.proto/
+
+# 本地工作记录与私有配置
+.workbuddy/
+config/cloud.js
+.env
+.env.*
+!.env.example
+*.log
+*.pem
+*.key
+__pycache__/
+*.pyc

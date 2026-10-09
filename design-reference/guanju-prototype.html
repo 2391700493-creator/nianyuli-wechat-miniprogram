@@ -1,0 +1,2428 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>念隅里 · 可点击原型</title>
+  <style>
+    /* ── 念隅里界面变量 ────────────────────────────────────────────────── */
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f4;
+      --surface-warm: #fafaf9;
+      --fg: #1d1d1f;
+      --fg-2: #424245;
+      --muted: #6e6e73;
+      --meta: #86868b;
+      --border: #d2d2d7;
+      --border-soft: #e8e8ed;
+      --accent: #1d1d1f;
+      --accent-on: #ffffff;
+      --accent-hover: #333336;
+      --accent-active: #464648;
+      --success: #16a34a;
+      --warn: #eab308;
+      --danger: #dc2626;
+      --font-display:
+        "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --font-body:
+        "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --font-mono:
+        "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 17px;
+      --text-lg: 21px;
+      --text-xl: 28px;
+      --text-2xl: 40px;
+      --leading-body: 1.47;
+      --leading-tight: 1.05;
+      --tracking-display: -0.015em;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 980px;
+      --elev-flat: none;
+      --elev-ring: 0 0 0 1px var(--border);
+      --elev-raised: 0 12px 32px rgba(0, 0, 0, 0.08);
+      --elev-card: 0 0 0 1px rgba(0, 0, 0, 0.045), 0 2px 5px rgba(0, 0, 0, 0.045), 0 9px 22px -9px rgba(0, 0, 0, 0.12);
+      --elev-card-hover: 0 0 0 1px rgba(0, 0, 0, 0.07), 0 3px 8px rgba(0, 0, 0, 0.06), 0 12px 26px -10px rgba(0, 0, 0, 0.15);
+      --focus-ring: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 65%);
+      --motion-fast: 150ms;
+      --motion-base: 220ms;
+      --ease-standard: cubic-bezier(0.28, 0, 0.22, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: var(--font-body);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; padding: 0; touch-action: manipulation; }
+    input, textarea { font: inherit; }
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* ── device frame ───────────────────────────────────────────────── */
+    .phone {
+      width: 393px;
+      height: 852px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      transform-origin: center center;
+      box-shadow: var(--elev-raised);
+      border: 1px solid var(--border);
+    }
+
+    /* ── iOS status bar ─────────────────────────────────────────────── */
+    .statusbar {
+      flex: none;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      color: var(--fg);
+      background: var(--surface);
+    }
+    .statusbar .time { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .statusbar .icons { display: flex; align-items: center; gap: 6px; }
+
+    /* ── WeChat mini-program nav ────────────────────────────────────── */
+    .navbar {
+      flex: none;
+      height: 44px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+    }
+    .navbar .brand { font-size: 17px; font-weight: 600; letter-spacing: 0.04em; }
+    .nav-back {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      color: var(--fg);
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .nav-back[hidden] { display: none; }
+    .nav-back:hover { background: var(--surface); }
+    .nav-back:active { background: var(--border-soft); }
+    .nav-back svg { width: 21px; height: 21px; }
+    .capsule {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 87px;
+      height: 32px;
+      border: 0.5px solid color-mix(in oklab, var(--fg) 26%, transparent);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      color: var(--fg);
+    }
+    .capsule .more, .capsule .close { width: 43px; display: flex; align-items: center; justify-content: center; }
+    .capsule .vsep { width: 0.5px; height: 16px; background: color-mix(in oklab, var(--fg) 26%, transparent); }
+
+    /* ── scrollable content + screen switching ──────────────────────── */
+    .content {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-width: none;
+      background: var(--surface);
+    }
+    .content::-webkit-scrollbar { display: none; }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      padding: 18px 20px 28px;
+    }
+    .screen[hidden] { display: none; }
+    #screenHome { gap: 0; }
+    #screenHome .hero { margin-bottom: 18px; }
+    #screenHome .quick { margin-bottom: 10px; }
+    #screenHome .overview { margin-bottom: 26px; }
+    #screenPeople { gap: 16px; }
+
+    /* ── home hero ──────────────────────────────────────────────────── */
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 25px;
+      line-height: 1.3;
+      font-weight: 600;
+      letter-spacing: var(--tracking-display);
+    }
+    .hero p { margin-top: 6px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+    .hero .eyebrow { margin: 0 0 7px; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--muted); }
+
+    /* ── quick record: single primary action ────────────────────────── */
+    .quick {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      text-align: left;
+      min-height: 108px;
+      padding: 15px 17px;
+      border-radius: var(--radius-lg);
+      background: var(--fg);
+      color: var(--accent-on);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09), 0 8px 18px -8px rgba(0, 0, 0, 0.2);
+      transition: background var(--motion-fast) var(--ease-standard), transform 0.06s ease;
+    }
+    .quick:hover { background: color-mix(in oklab, var(--fg) 88%, black); }
+    .quick:active { transform: translateY(1px); }
+    .quick-head { display: flex; align-items: center; justify-content: space-between; color: #bfc0c3; font-size: 11px; }
+    .quick-title { display: block; margin-top: 11px; font-size: 20px; font-weight: 600; line-height: 1.2; }
+    .quick-desc { display: block; margin-top: 3px; font-size: 12px; line-height: 1.35; color: #c9c9cc; }
+    .quick-arrow { color: var(--accent-on); font-size: 20px; line-height: 1; }
+    .overview { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .metric { min-height: 96px; display: flex; flex-direction: column; align-items: flex-start; padding: 13px 14px; border-radius: 16px; background: var(--bg); box-shadow: var(--elev-card); }
+    .metric-label { color: var(--fg-2); font-size: 12px; font-weight: 500; }
+    .metric-value { margin-top: auto; font-size: 29px; line-height: 1; font-weight: 600; }
+    .metric-foot { margin-top: 4px; color: var(--meta); font-size: 11px; }
+
+    /* ── section shell ──────────────────────────────────────────────── */
+    .block { display: flex; flex-direction: column; gap: 12px; }
+    .home-recent .events { padding-left: 25px; }
+    .home-recent .events::before { left: 8px; background: #c7c7cb; }
+    .home-recent .events > li::before { left: -23px; top: 16px; background: var(--surface); }
+    .home-recent .events > li + li { margin-top: 9px; }
+    .home-recent .event { padding: 8px 10px 10px; border-radius: 12px; }
+    .home-recent .event-meta { gap: 7px; }
+    .home-recent .meta-chip { border: 0; padding: 0; background: none; }
+    .block-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .block-head h2 {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+    }
+    .head-actions { display: flex; align-items: center; gap: 14px; }
+    .link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 0;
+      transition: color var(--motion-fast) var(--ease-standard);
+    }
+    .link:hover { color: var(--accent-hover); }
+    .link.quiet { color: var(--muted); }
+    .link.quiet:hover { color: var(--fg-2); }
+    .link svg { width: 13px; height: 13px; }
+    .guide { font-size: 12.5px; line-height: 1.45; color: var(--muted); margin-top: -4px; }
+
+    /* ── search ─────────────────────────────────────────────────────── */
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 12px;
+      background: var(--bg);
+      border: 1px solid color-mix(in oklab, var(--fg) 9%, transparent);
+      border-radius: var(--radius-md);
+      transition: border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
+    }
+    .search svg { flex: none; width: 16px; height: 16px; color: var(--muted); }
+    .search input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: none;
+      outline: none;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .search input::placeholder { color: var(--muted); }
+    .search:focus-within { border-color: var(--accent); box-shadow: var(--focus-ring); }
+
+    /* ── cards ──────────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-card);
+      overflow: hidden;
+    }
+
+    /* ── people cards (人物) ────────────────────────────────────────── */
+    .people-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .pcard {
+      width: 100%;
+      height: 100%;
+      min-height: 132px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      padding: 15px;
+      text-align: left;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--elev-card);
+      transition: box-shadow 160ms ease-out, transform 160ms ease-out;
+    }
+    .pcard:hover { box-shadow: var(--elev-card-hover); transform: translateY(-3px); }
+    .pcard:active { box-shadow: var(--elev-card); transform: translateY(0) scale(.98); }
+    .pcard-top { display: flex; align-items: center; gap: 10px; }
+    .pcard-name { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
+    .pcard-note {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pcard-count { margin-top: auto; font-size: 11px; color: var(--muted); }
+
+    .pcard.new {
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent);
+      box-shadow: none;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pcard.new:hover { border-color: var(--accent); box-shadow: none; background: color-mix(in oklab, var(--accent) 7%, transparent); }
+    .pcard.new:active { background: color-mix(in oklab, var(--accent) 12%, transparent); }
+    .pcard.new .plus {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      background: color-mix(in oklab, var(--accent) 12%, transparent);
+    }
+    .pcard.new .plus svg { width: 18px; height: 18px; }
+
+    .avatar {
+      flex: none;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg);
+      overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .chip {
+      flex: none;
+      font-size: 11px;
+      line-height: 1;
+      padding: 5px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      white-space: nowrap;
+    }
+
+    .empty {
+      padding: 22px 14px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    .empty.boxed {
+      padding: 24px 16px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+    }
+
+    /* ── event meta chips (shared) ──────────────────────────────────── */
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      line-height: 1;
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      white-space: nowrap;
+    }
+    .meta-chip .who { font-weight: 600; }
+    .meta-chip .judge { color: var(--muted); }
+
+    /* shared emotion dots */
+    .emotion { flex: none; display: flex; gap: 3px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
+    .dot.on { background: var(--fg); }
+
+    /* ── profile header (person) ────────────────────────────────────── */
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--fg);
+      box-shadow: var(--elev-card);
+    }
+    .avatar-upload {
+      position: relative;
+      flex: none;
+      width: 62px; height: 62px;
+      display: grid; place-items: center;
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .profile .avatar-letter { width: 100%; height: 100%; display: grid; place-items: center; border-radius: 50%; background: #f2f2f3; }
+    .avatar-letter[hidden] { display: none; }
+    .avatar-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .avatar-photo[hidden] { display: none; }
+    .avatar-camera {
+      position: absolute;
+      right: -2px; bottom: -2px;
+      width: 21px; height: 21px;
+      display: grid; place-items: center;
+      border: 2px solid var(--bg);
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-on);
+      font-size: 15px;
+      line-height: 1;
+    }
+    .profile-copy { flex: 1; min-width: 0; }
+    .profile h1 {
+      font-family: var(--font-display);
+      font-size: 21px;
+      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: var(--tracking-display);
+    }
+    .profile h1 { color: #fff; }
+    .profile .note { margin-top: 4px; font-size: 12px; line-height: 1.5; color: #c7c7ca; white-space: pre-line; }
+    .profile .ghost-btn { color: #fff; }
+    .ghost-btn {
+      margin-top: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      transition: color var(--motion-fast) var(--ease-standard);
+    }
+    .ghost-btn:hover { color: var(--accent-hover); }
+    .profile-basics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .profile-basics[hidden] { display: none; }
+    .basic-chip { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); color: #e8e8ea; font-size: 11.5px; line-height: 1.5; }
+    .basic-chip .basic-label { color: #9d9da3; }
+    .profile-basics[hidden] { display: none; }
+    #screenPerson { gap: 22px; }
+    #screenPerson #person-tags { padding: 16px; border-radius: 16px; background: var(--bg); box-shadow: var(--elev-card); }
+
+    /* ── current tags (person) ──────────────────────────────────────── */
+    .tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 44px;
+      font-size: 13.5px;
+      line-height: 1;
+      padding: 9px 12px 9px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg-2);
+      transition: background var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+    }
+    .tag-btn:hover { border-color: var(--fg-2); }
+    .tag-btn.active { background: var(--fg); border-color: var(--fg); color: var(--accent-on); }
+    .tag-count {
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+      padding: 3px 6px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--muted);
+    }
+    .tag-btn.active .tag-count {
+      background: color-mix(in oklab, var(--accent-on) 22%, transparent);
+      color: var(--accent-on);
+    }
+    .tag-wrap.dense { gap: 6px; }
+    .tag-wrap.dense .tag-btn { gap: 5px; padding-inline: 9px; font-size: 12px; }
+    .tag-wrap.very-dense { gap: 4px; }
+    .tag-wrap.very-dense .tag-btn { gap: 4px; padding-inline: 7px; font-size: 11.5px; }
+    .tag-wrap.very-dense .tag-count { padding: 2px 4px; font-size: 10px; }
+
+    /* ── events · vertical timeline (person) ────────────────────────── */
+    .events {
+      list-style: none;
+      position: relative;
+      padding-left: 24px;
+    }
+    #events { max-height: 390px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-right: 5px; scrollbar-width: thin; }
+    #events:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .events::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 12px;
+      bottom: 12px;
+      width: 1.5px;
+      background: var(--border);
+    }
+    .events > li { position: relative; }
+    .events > li::before {
+      content: "";
+      position: absolute;
+      left: -22px;
+      top: 8px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--fg);
+    }
+    .events > li + li { margin-top: 8px; }
+
+    .event {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 6px 8px;
+      text-align: left;
+      background: none;
+      border: 0;
+      border-radius: var(--radius-md);
+      transition: background var(--motion-fast) var(--ease-standard);
+    }
+    .event:hover { background: var(--surface); }
+    .event:active { background: var(--surface-warm); }
+    .event-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .event-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 15px; line-height: 1.5; color: var(--fg); }
+    .home-recent .event-text { -webkit-line-clamp: 2; }
+    .event-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tchip {
+      font-size: 11px;
+      line-height: 1;
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg-2);
+      white-space: nowrap;
+    }
+    .event-date { font-size: 12px; color: var(--muted); }
+
+    .manage-bar { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface); font-size: 13px; }
+    .manage-bar[hidden], #managePeople[hidden], .records-more[hidden], .detail-danger[hidden], #impressionSearch[hidden] { display: none; }
+    .manage-bar span { flex: 1; }
+    .manage-bar button { padding: 8px 10px; border-radius: 10px; }
+    #deleteSelectedPeople { color: #b42318; }
+    #deleteSelectedPeople:disabled { color: var(--muted); }
+    .pcard.selected { box-shadow: inset 0 0 0 2px var(--fg); }
+    .pcard-check { display: block; margin-top: 8px; font-size: 12px; color: var(--fg-2); }
+    .record-filters { display: flex; align-items: end; gap: 8px; margin: 12px 0 20px; }
+    .record-person-scope { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; margin-bottom: 14px; border-radius: 12px; background: var(--surface); font-size: 13px; font-weight: 600; }
+    .record-person-scope[hidden] { display: none; }
+    .record-person-scope button { color: var(--fg-2); font-size: 12px; font-weight: 400; }
+    .record-filters label { flex: 1; min-width: 0; color: var(--muted); font-size: 11px; }
+    .record-filters input { display: block; width: 100%; margin-top: 5px; padding: 9px 6px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--fg); font-size: 16px; }
+    .record-filters button, .records-more { padding: 10px; color: var(--fg-2); font-size: 12px; }
+    .records-more { display: block; width: 100%; margin: 14px 0; }
+    .detail-danger { padding: 12px 18px 18px; border-top: 1px solid var(--border-soft); }
+    .detail-danger button { color: #b42318; font-size: 13px; }
+    /* ── tab bar + safe area ────────────────────────────────────────── */
+    .tabbar {
+      flex: none;
+      height: 56px;
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      align-items: stretch;
+      background: var(--surface);
+    }
+    .tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--muted);
+      transition: color var(--motion-fast) var(--ease-standard);
+    }
+    .tab.active { color: var(--fg); }
+    .tab .icon-solid { display: none; }
+    .tab.active .icon-outline { display: none; }
+    .tab.active .icon-solid { display: block; }
+    .tab svg { width: 22px; height: 22px; }
+    @media (prefers-reduced-motion: reduce) { .pcard { transition: none; } }
+    .tab .label { font-size: 10px; line-height: 1; }
+    .safe-area { flex: none; height: 30px; display: flex; align-items: center; justify-content: center; }
+    .home-indicator { width: 134px; height: 5px; border-radius: 3px; background: var(--fg); opacity: 0.85; }
+
+    /* ── toast ──────────────────────────────────────────────────────── */
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 128px;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--fg);
+      color: var(--accent-on);
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--motion-base) var(--ease-standard), transform var(--motion-base) var(--ease-standard);
+      z-index: 30;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── quick-record sheet ─────────────────────────────────────────── */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: color-mix(in oklab, var(--fg) 55%, transparent);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--motion-base) var(--ease-standard), visibility var(--motion-base);
+      z-index: 40;
+    }
+    .sheet-backdrop.show { opacity: 1; visibility: visible; }
+
+    .sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      height: 88%;
+      max-height: calc(100% - 44px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      background: var(--bg);
+      border-radius: 22px 22px 0 0;
+      padding: 10px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform 320ms var(--ease-standard);
+      z-index: 41;
+    }
+    .sheet::-webkit-scrollbar { display: none; }
+    .sheet.show { transform: translateY(0); }
+
+    .grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--border); margin: 4px auto 14px; }
+    .sheet-head { flex: none; display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .sheet-head h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+    .quick-note { margin: 2px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .sheet-close { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; color: var(--fg-2); }
+    .sheet-close:hover { background: var(--border-soft); }
+    .sheet-close svg { width: 15px; height: 15px; }
+
+    .field { flex: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .field > .flabel { font-size: 13px; font-weight: 600; color: var(--fg-2); }
+    .flabel .opt { font-weight: 400; color: var(--muted); margin-left: 4px; }
+    .event-editor { width: 100%; min-height: 200px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--fg); font-size: 15px; line-height: 1.8; outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .event-editor { border-radius: 12px 12px 0 0; }
+    .event-editor:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
+    .event-editor:empty::before { content: attr(data-placeholder); color: var(--muted); pointer-events: none; }
+    .person-token { display: inline-flex; align-items: center; gap: 3px; padding: 0 5px 0 9px; margin: 0 2px; border-radius: var(--radius-pill); background: var(--fg); color: var(--accent-on); font-size: 13px; line-height: 25px; vertical-align: baseline; white-space: nowrap; }
+    .person-token button { display: inline-grid; place-items: center; width: 20px; height: 20px; padding: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 16px; line-height: 1; }
+    .person-token button:hover { background: rgba(255,255,255,.18); }
+    .person-tools { display: flex; align-items: center; gap: 10px; margin-top: -8px; padding: 2px 12px; border: 1px solid var(--border); border-top-color: color-mix(in oklab, var(--fg) 15%, var(--border)); border-radius: 0 0 12px 12px; background: color-mix(in oklab, var(--fg) 9%, var(--bg)); }
+    .person-add { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; border: 0; border-radius: 8px; padding: 8px 4px; background: transparent; color: var(--fg); font-size: 14px; font-weight: 600; }
+    .person-add:active { transform: scale(.97); }
+    .person-add .plus { font-size: 20px; line-height: 1; font-weight: 400; }
+    #screenPeople details { position: relative; }
+    #screenPeople summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+    #screenPeople details[open] > button { position: absolute; z-index: 2; right: 0; white-space: nowrap; padding: 12px 16px; background: var(--bg); border-radius: 10px; box-shadow: var(--elev-card); }
+    #tagDetailPersons button { min-height: 44px; }
+    #eventDetailTags > p { margin: 12px 0 6px; font-size: 13px; }
+    .person-summary { color: var(--fg-2); font-size: 12px; }
+    .person-picker-backdrop { position: absolute; inset: 0; z-index: 42; background: color-mix(in oklab, var(--fg) 48%, transparent); }
+    .person-picker-backdrop[hidden], .person-picker[hidden] { display: none; }
+    .person-picker { position: absolute; z-index: 43; top: 50%; left: 20px; right: 20px; transform: translateY(-50%); max-height: calc(100% - 48px); overflow-y: auto; padding: 20px; border-radius: 20px; background: var(--bg); box-shadow: var(--elev-raised); }
+    .person-picker-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .person-picker-head h3 { font-size: 18px; }
+    .person-picker-close { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--surface); font-size: 22px; }
+    .person-picker input { width: 100%; height: 44px; padding: 0 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--fg); font: inherit; font-size: 16px; }
+    .person-picker-list { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; max-height: 250px; overflow: auto; margin: 18px 0 20px; }
+    .person-option { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 8px 13px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--bg); color: var(--fg); font-size: 14px; }
+    .person-option.active { border-color: var(--fg); background: var(--fg); color: var(--accent-on); }
+    @media (hover: hover) and (pointer: fine) {
+      .person-add:hover { background: var(--border-soft); }
+      .person-option:hover { border-color: var(--fg); }
+    }
+    .person-option .check { font-weight: 700; }
+    .person-picker-empty { color: var(--muted); font-size: 13px; }
+    .person-picker-done { width: 100%; min-height: 44px; border-radius: 10px; background: var(--fg); color: var(--accent-on); font-size: 14px; font-weight: 600; }
+    .person-picker-done:disabled { opacity: .45; cursor: not-allowed; }
+    .missing-person-backdrop { position: absolute; inset: 0; z-index: 42; background: color-mix(in oklab, var(--fg) 48%, transparent); }
+    .missing-person-backdrop[hidden], .missing-person-dialog[hidden] { display: none; }
+    .missing-person-dialog { position: absolute; z-index: 43; left: 24px; right: 24px; top: 50%; transform: translateY(-50%); padding: 22px; border-radius: 18px; background: var(--surface); box-shadow: var(--elev-card); }
+    .missing-person-dialog h3 { margin: 0 0 9px; color: var(--fg); font-size: 18px; }
+    .missing-person-dialog p { margin: 0 0 18px; color: var(--fg-2); font-size: 14px; line-height: 1.6; }
+    .missing-person-actions { display: flex; flex-direction: column; gap: 8px; }
+    .missing-person-actions button { min-height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; }
+    .missing-person-confirm { background: var(--fg); color: var(--accent-on); }
+    .missing-person-skip, .missing-person-cancel { background: var(--bg); color: var(--fg); }
+    .form-backdrop { position: absolute; inset: 0; z-index: 44; background: color-mix(in oklab, var(--fg) 48%, transparent); }
+    .form-backdrop[hidden], .form-dialog[hidden] { display: none; }
+    .form-dialog { position: absolute; z-index: 45; top: 50%; left: 20px; right: 20px; transform: translateY(-50%); max-height: calc(100% - 48px); overflow-y: auto; padding: 22px; border-radius: 20px; background: var(--bg); box-shadow: var(--elev-raised); }
+    .form-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .form-dialog-head h2 { font-size: 20px; line-height: 1.2; }
+    .dialog-close { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--surface); font-size: 22px; }
+    .dialog-field { display: flex; align-items: baseline; justify-content: space-between; margin: 14px 0 8px; font-size: 13px; font-weight: 600; color: var(--fg-2); }
+    .dialog-field span { font-size: 12px; font-weight: 400; color: var(--muted); }
+    .dialog-input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--fg); font: inherit; font-size: 16px; outline: none; }
+    .dialog-input:focus, .dialog-input:focus-visible, .event-editor:focus, .event-editor:focus-visible { border-color: #81858d; box-shadow: 0 0 0 2px rgba(29, 29, 31, .12); outline: none; }
+    .dialog-textarea { min-height: 92px; resize: vertical; line-height: 1.5; }
+    .dialog-error { margin-top: 10px; color: var(--danger); font-size: 13px; }
+    .dialog-error[hidden] { display: none; }
+    .dialog-help { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .dialog-primary { width: 100%; min-height: 46px; margin-top: 20px; border-radius: 11px; background: var(--fg); color: var(--accent-on); font-size: 14px; font-weight: 600; }
+    .dialog-primary:active { transform: scale(.99); }
+    .manage-tags { display: flex; flex-wrap: wrap; gap: 8px; min-height: 44px; margin: 16px 0; }
+    .manage-tag { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 4px 6px 4px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); font-size: 13px; }
+    .manage-tag button { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; font-size: 17px; }
+    .manage-tag button:hover { background: var(--border-soft); }
+    .manage-tag .manage-tag-name { width: auto; height: auto; min-height: 32px; padding: 0 5px; border-radius: var(--radius-pill); font-size: 13px; }
+    .delete-actions #deleteConfirmButton, .delete-actions #peopleDeleteConfirmButton { background: var(--danger); color: #fff; }
+    .manage-empty { align-self: center; color: var(--muted); font-size: 13px; }
+    /* ── 印象用词页 ────────────────────────────────────────────────── */
+    .taglib-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .taglib-row { width: 100%; display: flex; align-items: center; gap: 12px; padding: 15px 16px; background: var(--bg); border-radius: var(--radius-lg); box-shadow: var(--elev-card); text-align: left; transition: box-shadow 160ms ease-out, transform 160ms ease-out; }
+    .taglib-row:hover { box-shadow: var(--elev-card-hover); transform: translateY(-2px); }
+    .taglib-row .name { font-size: 15px; font-weight: 600; }
+    .taglib-row .use { margin-left: auto; font-size: 12px; color: var(--muted); }
+    .taglib-row svg { flex: none; width: 14px; height: 14px; color: var(--muted); }
+    .lib-add { display: flex; gap: 8px; }
+    .lib-add .dialog-input { flex: 1; }
+    .lib-add .save { width: auto; padding: 0 18px; }
+    .taglib-events { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .taglib-events li { padding: 10px 12px; border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface); display: flex; flex-direction: column; gap: 4px; }
+    .taglib-events .e-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .taglib-events .e-text { font-size: 14px; line-height: 1.5; color: var(--fg); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .event-detail-dialog { display: flex; flex-direction: column; max-height: calc(100% - 32px); overflow: hidden; }
+    .event-detail-dialog .form-dialog-head { flex: none; }
+    .detail-scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: 3px; }
+    .detail-date { color: var(--muted); font-size: 13px; }
+    .detail-text { min-height: 84px; margin: 12px 0 22px; padding: 16px; border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface); font-size: 16px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .detail-edit-text { min-height: 180px; resize: vertical; line-height: 1.6; }
+    .detail-group { display: flex; flex-direction: column; gap: 9px; padding: 13px 0; border-top: 1px solid var(--border-soft); }
+    .detail-group[hidden] { display: none; }
+    .detail-group > span { color: var(--muted); font-size: 12px; }
+    .detail-group strong { font-size: 14px; font-weight: 600; }
+    .detail-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag-choices { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; max-height: 150px; overflow-y: auto; margin: 10px 0 14px; }
+    .tag-choices button { min-height: 44px; padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg-2); font-size: 13px; }
+    .tag-choices button[aria-pressed="true"] { color: var(--accent-on); background: var(--fg); border-color: var(--fg); }
+    .event-edit-judgments { margin-top: 18px; }
+    .event-edit-judgments small { font-size: 12px; font-weight: 400; }
+    .detail-chip { display: inline-flex; align-items: center; min-height: 30px; padding: 5px 10px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg); font-size: 13px; }
+    .new-tag-trigger { align-self: flex-start; min-height: 44px; padding: 0 14px; border: 1px dashed var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--fg); font-size: 13px; }
+    #personAdvanced[hidden] { display: none; }
+    .detail-actions { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-top: 16px; border-top: 1px solid var(--border-soft); }
+    .detail-actions[hidden], #eventRead[hidden], #eventEditPanel[hidden] { display: none; }
+    .detail-actions button { min-height: 44px; padding: 0 12px; border-radius: 10px; background: var(--surface); color: var(--fg); font-size: 13px; font-weight: 600; }
+    .detail-actions #eventEdit { background: var(--fg); color: var(--accent-on); }
+    .detail-actions .detail-save { background: var(--fg); color: var(--accent-on); }
+    .detail-actions .danger-link { color: var(--danger); background: transparent; }
+    .delete-actions { display: flex; gap: 9px; margin-top: 20px; }
+    .delete-actions button { flex: 1; min-height: 44px; border-radius: 10px; background: var(--surface); font-size: 14px; font-weight: 600; }
+    .delete-actions #eventTagAdd { background: var(--fg); color: var(--accent-on); }
+
+    .score { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .sdot { min-width: 0; min-height: 52px; padding: 7px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); color: var(--fg-2); }
+    .sdot svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .sdot span { font-size: 11px; white-space: nowrap; }
+    .sdot.on { background: var(--fg); border-color: var(--fg); color: var(--accent-on); }
+    .mood-badge { display: inline-flex; align-items: center; min-height: 23px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--surface); color: var(--fg-2); font-size: 11px; }
+
+    .sheet-error {
+      min-height: 18px;
+      font-size: 13px;
+      color: var(--danger);
+      margin: auto 0 10px;
+      opacity: 0;
+      transition: opacity var(--motion-fast) var(--ease-standard);
+    }
+    .sheet-error.show { opacity: 1; }
+
+    .save {
+      flex: none;
+      width: 100%;
+      padding: 15px;
+      border-radius: var(--radius-md);
+      background: var(--accent);
+      color: var(--accent-on);
+      font-size: 16px;
+      font-weight: 600;
+      transition: background var(--motion-fast) var(--ease-standard), transform 0.06s ease;
+    }
+    .save:hover { background: var(--accent-hover); }
+    .save:active { background: var(--accent-active); transform: translateY(1px); }
+
+    @media (max-width: 420px) {
+      .phone { width: 100vw; height: 100vh; border: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" id="phone" data-od-id="app">
+
+    <header class="statusbar" data-od-id="statusbar" aria-hidden="true">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" aria-hidden="true"><rect x="0" y="7" width="3" height="5" rx="0.7" fill="currentColor"></rect><rect x="4.5" y="5" width="3" height="7" rx="0.7" fill="currentColor"></rect><rect x="9" y="3" width="3" height="9" rx="0.7" fill="currentColor"></rect><rect x="13.5" y="0" width="3" height="12" rx="0.7" fill="currentColor"></rect></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 4.2a9.2 9.2 0 0 1 12 0"></path><path d="M4.2 6.7a5.9 5.9 0 0 1 7.6 0"></path><path d="M6.5 9.2a2.6 2.6 0 0 1 3 0"></path><circle cx="8" cy="10.6" r="1" fill="currentColor" stroke="none"></circle></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><rect x="0.5" y="0.5" width="21" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity="0.35"></rect><rect x="2.2" y="2.2" width="15" height="7.6" rx="1.8" fill="currentColor"></rect><path d="M23 4a2 2 0 0 1 0 4" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.2"></path></svg>
+      </span>
+    </header>
+
+    <div class="navbar" data-od-id="navbar">
+      <button class="nav-back" id="navBack" hidden aria-label="返回" data-od-id="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>
+      </button>
+      <span class="brand" id="navTitle">念隅里</span>
+      <div class="capsule" aria-hidden="true">
+        <span class="more">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="18" cy="12" r="1.7"></circle></svg>
+        </span>
+        <span class="vsep"></span>
+        <span class="close">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 8.5h.01M15.5 8.5h.01M9 15a4 4 0 0 0 6 0"></path></svg>
+        </span>
+      </div>
+    </div>
+
+    <main class="content" id="content">
+
+      <!-- ═══════════════════ 首页 ═══════════════════ -->
+      <div class="screen" id="screenHome" data-od-id="home-screen">
+        <div class="hero" data-od-id="hero">
+          <p class="eyebrow">关系备忘</p>
+          <h1>记录重要的相处</h1>
+          <p>保存发生过的事，也保存当时的判断。</p>
+        </div>
+
+        <button class="quick" id="quickRecord" data-od-id="quick-record">
+          <span class="quick-head"><span>从一件事开始</span><span class="quick-arrow">↗</span></span>
+          <span class="quick-title">快速记录</span>
+          <span class="quick-desc">把影响你判断的瞬间留下来</span>
+        </button>
+
+        <div class="overview" aria-label="记录概览">
+          <div class="metric"><span class="metric-label">重要人物</span><strong class="metric-value" id="homePeopleCount">3</strong><span class="metric-foot">位正在留意的人</span></div>
+          <div class="metric"><span class="metric-label">相处记录</span><strong class="metric-value" id="homeEventCount">10</strong><span class="metric-foot">件有依据的事</span></div>
+        </div>
+
+        <section class="block home-recent" data-od-id="recent">
+          <div class="block-head">
+            <h2>最近记录</h2>
+            <button class="link" id="homePeopleLink">
+              查看人物
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+            </button>
+          </div>
+          <ul class="events" id="recentList" data-od-id="recent-timeline"></ul>
+        </section>
+      </div>
+
+      <!-- ═══════════════════ 全部记录 ═══════════════════ -->
+      <div class="screen" id="screenRecords" hidden data-od-id="records-screen">
+        <div class="hero"><h1>全部记录</h1><p>按时间回看每件相处小事。</p></div>
+        <div class="record-person-scope" id="recordPersonScope" hidden><span id="recordPersonName"></span><button id="recordShowEveryone" type="button">查看全部人物</button></div>
+        <label class="search"><input id="recordSearch" type="search" placeholder="搜索事件、人物或印象" aria-label="搜索事件、人物或印象" autocomplete="off"></label>
+        <div class="record-filters"><label>开始日期<input id="recordStart" type="date"></label><label>结束日期<input id="recordEnd" type="date"></label><button id="recordClearDates" type="button">清除</button></div>
+        <ul class="events" id="allRecords"></ul><p class="empty" id="recordsEmpty" hidden>没有找到相关记录，试试调整搜索条件。</p>
+        <button class="records-more" id="recordsMore" type="button" hidden>加载更多记录</button>
+      </div>
+
+      <!-- ═══════════════════ 人物 ═══════════════════ -->
+      <div class="screen" id="screenPeople" hidden data-od-id="people-screen">
+        <div class="hero" data-od-id="people-hero">
+          <div class="block-head"><h1>人物</h1><div class="head-actions"><button class="link" id="managePeople" type="button">管理</button><button class="link" id="addJudgment" type="button">印象用词</button></div></div><div class="manage-bar" id="manageBar" hidden><span id="selectedCount">已选 0 人</span><button id="deleteSelectedPeople" type="button" disabled>删除所选</button><button id="cancelManage" type="button">取消</button></div>
+        </div>
+
+        <section class="block" data-od-id="people-list">
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            <input id="personSearch" type="search" placeholder="搜索人物" aria-label="搜索人物">
+          </label>
+          <div>
+            <ul class="people-grid" id="peopleGrid" data-od-id="people-grid"></ul>
+            <p class="empty" id="noResult" hidden>没有找到相关人物</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ═══════════════════ 人际档案 ═══════════════════ -->
+      <div class="screen" id="screenPerson" hidden data-od-id="person-screen">
+        <!-- ① 人物基础信息 -->
+        <section class="profile" data-od-id="person-info">
+          <button class="avatar-upload" id="pAvatar" type="button" aria-label="上传人物照片" title="上传人物照片">
+            <span class="avatar-letter">王</span>
+            <img class="avatar-photo" alt="" hidden>
+            <span class="avatar-camera" aria-hidden="true">＋</span>
+          </button>
+          <input id="avatarFile" type="file" accept="image/*" hidden>
+          <div class="profile-copy">
+            <h1 id="pName">小王</h1>
+            <p class="note" id="pNote">大学室友，现在同一家公司</p>
+            <p class="profile-basics" id="pBasics" hidden></p>
+            <button class="ghost-btn" id="editPerson" type="button">编辑资料</button>
+          </div>
+        </section>
+
+        <!-- ② 事件中的印象标签 -->
+        <section class="block" id="person-tags" data-od-id="person-tags">
+          <div class="block-head">
+            <h2>事件中的印象</h2>
+          </div>
+          <div class="tag-wrap" id="tagWrap"></div>
+        </section>
+
+        <!-- ③ 重要事件时间线 + ④ 标签回溯 -->
+        <section class="block" data-od-id="person-events">
+          <div class="block-head">
+            <h2 id="eventsTitle">最近事件</h2>
+            <div class="head-actions">
+              <button class="link quiet" id="viewPersonRecords" type="button">查看全部记录</button>
+              <button class="link" id="recordForPerson">记一件事</button>
+            </div>
+          </div>
+          <ul class="events" id="events" tabindex="0" aria-label="重要事件，可滚动"></ul>
+          <p class="empty boxed" id="noSupport" hidden>没有符合这个印象的事件，清除筛选可查看全部记录。</p>
+        </section>
+      </div>
+
+      <!-- ═══════════════════ 印象用词 ═══════════════════ -->
+      <div class="screen" id="screenTags" hidden data-od-id="tags-screen">
+        <div class="hero" data-od-id="tags-hero">
+          <h1>印象用词</h1>
+          <p>整理记录时使用的印象词。新增用词不会给人物添加印象。</p>
+        </div>
+        <section class="block" data-od-id="tag-new">
+          <span class="flabel">新增印象词</span>
+          <div class="lib-add">
+            <input class="dialog-input" id="libNewTag" type="text" maxlength="8" autocomplete="off" placeholder="例如：兑现承诺">
+            <button class="save" id="libAddTag" type="button">加入词库</button>
+          </div>
+          <p class="dialog-error" id="libError" role="alert" hidden></p>
+        </section>
+        <section class="block" data-od-id="tag-library">
+          <ul class="taglib-list" id="tagLibList"></ul>
+        </section>
+      </div>
+    </main>
+
+    <nav class="tabbar" data-od-id="tabbar">
+      <button class="tab" id="tabRecords" data-od-id="tab-records">
+        <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="6" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="18" r="1"/><path d="M9 6h11M9 12h11M9 18h11"/></svg>
+        <svg class="icon-solid" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="6" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="5" cy="18" r="1.5"/><path d="M9 5h11v2H9zM9 11h11v2H9zM9 17h11v2H9z"/></svg>
+        <span class="label">记录</span>
+      </button>
+      <button class="tab active" id="tabHome" data-od-id="tab-home" aria-current="page">
+        <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.2 12 4.5l8 6.7"></path><path d="M6.2 9.8V19a1 1 0 0 0 1 1h9.6a1 1 0 0 0 1-1V9.8"></path></svg>
+        <svg class="icon-solid" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.5 2.8 11a1 1 0 0 0 1.3 1.5L5 11.8V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7.2l.9.7a1 1 0 0 0 1.3-1.5L12 3.5Z"/></svg>
+        <span class="label">首页</span>
+      </button>
+      <button class="tab" id="tabPeople" data-od-id="tab-people">
+        <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.5 20c0-4 3.4-6.4 7.5-6.4s7.5 2.4 7.5 6.4"></path></svg>
+        <svg class="icon-solid" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M12 13c-4.8 0-8 2.6-8 6.4 0 .9.7 1.6 1.6 1.6h12.8c.9 0 1.6-.7 1.6-1.6C20 15.6 16.8 13 12 13Z"/></svg>
+        <span class="label">人物</span>
+      </button>
+    </nav>
+
+    <div class="safe-area" aria-hidden="true"><span class="home-indicator"></span></div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet" id="sheet" data-od-id="quick-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <h2 id="sheetTitle">快速记录</h2>
+        <button class="sheet-close" id="sheetClose" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+
+      <div class="field">
+        <span class="flabel">发生了什么</span>
+        <div id="eventText" class="event-editor" contenteditable="true" role="textbox" aria-label="发生了什么" aria-multiline="true" data-placeholder="比如：小王答应帮我，却连续两次爽约。"></div>
+        <div class="person-tools">
+          <button class="person-add" id="personAdd" type="button" aria-haspopup="dialog" aria-controls="personPicker" aria-expanded="false"><span class="plus" aria-hidden="true">@</span> 点击关联人物</button>
+          <span class="person-summary" id="personSummary">至少关联 1 人</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="flabel">我当时的心情<span class="opt">可选</span></span>
+        <div class="score" id="quickMood" role="group" aria-label="我当时的心情"></div>
+      </div>
+
+      <p class="quick-note">先记下发生的事。保存后，可补充每个人在这件事里的表现。</p>
+
+      <p class="sheet-error" id="sheetError" role="alert"></p>
+      <button class="save" id="sheetSave">保存</button>
+    </div>
+    <div class="person-picker-backdrop" id="personPickerBackdrop" hidden></div>
+    <div class="person-picker" id="personPicker" role="dialog" aria-modal="true" aria-labelledby="personPickerTitle" hidden>
+      <div class="person-picker-head"><h3 id="personPickerTitle">选择关联人物</h3><button class="person-picker-close" id="personPickerClose" type="button" aria-label="关闭人物选择">×</button></div>
+      <input id="personPickerSearch" type="search" placeholder="搜索人物" aria-label="搜索人物" autocomplete="off" spellcheck="false" />
+      <div class="person-picker-list" id="personPickerList"></div>
+      <button class="person-picker-done" id="personPickerDone" type="button">插入所选人物</button>
+    </div>
+    <div class="missing-person-backdrop" id="missingPersonBackdrop" hidden></div>
+    <div class="missing-person-dialog" id="missingPersonDialog" role="dialog" aria-modal="true" aria-labelledby="missingPersonTitle" hidden>
+      <h3 id="missingPersonTitle">文中提到了人物</h3>
+      <p id="missingPersonMessage"></p>
+      <div class="missing-person-actions">
+        <button class="missing-person-confirm" id="missingPersonConfirm" type="button">关联后保存</button>
+        <button class="missing-person-skip" id="missingPersonSkip" type="button">保持现有关联并保存</button>
+        <button class="missing-person-cancel" id="missingPersonCancel" type="button">返回修改</button>
+      </div>
+    </div>
+    <div class="missing-person-backdrop" id="unknownPersonBackdrop" hidden></div>
+    <div class="missing-person-dialog" id="unknownPersonDialog" role="dialog" aria-modal="true" aria-labelledby="unknownPersonTitle" hidden>
+      <h3 id="unknownPersonTitle">发现未建档的名字</h3>
+      <p id="unknownPersonMessage"></p>
+      <div class="missing-person-actions">
+        <button class="missing-person-confirm" id="unknownPersonConfirm" type="button">建档并保存</button>
+        <button class="missing-person-skip" id="unknownPersonSkip" type="button">不建了，直接保存</button>
+        <button class="missing-person-cancel" id="unknownPersonCancel" type="button">返回修改</button>
+      </div>
+    </div>
+    <div class="form-backdrop" id="formBackdrop" hidden></div>
+    <div class="form-dialog" id="personForm" role="dialog" aria-modal="true" aria-labelledby="personFormTitle" hidden>
+      <div class="form-dialog-head"><h2 id="personFormTitle">新建人物</h2><button class="dialog-close" id="personFormClose" type="button" aria-label="关闭">×</button></div>
+      <label class="dialog-field" for="personName">名字 <span>必填</span></label>
+      <input class="dialog-input" id="personName" type="text" maxlength="20" autocomplete="off" placeholder="怎么称呼这个人" />
+      <label class="dialog-field" for="personNote">备注 <span>可选</span></label>
+      <textarea class="dialog-input dialog-textarea" id="personNote" maxlength="100" placeholder="例如：大学室友，现在同一家公司"></textarea>
+      <div id="personAdvanced">
+      <label class="dialog-field" for="personGender">性别 <span>可选</span></label>
+      <select class="dialog-input" id="personGender"><option value="">不填写</option><option value="女">女</option><option value="男">男</option><option value="其他">其他</option></select>
+      <label class="dialog-field" for="personRelation">与我的关系 <span>可选</span></label>
+      <input class="dialog-input" id="personRelation" type="text" maxlength="30" placeholder="例如：大学室友" />
+      <label class="dialog-field" for="personWork">职业或工作 <span>可选</span></label>
+      <input class="dialog-input" id="personWork" type="text" maxlength="40" placeholder="例如：产品经理" />
+      <label class="dialog-field" for="personCity">所在城市 <span>可选</span></label>
+      <input class="dialog-input" id="personCity" type="text" maxlength="30" placeholder="例如：上海" />
+      <label class="dialog-field" for="personBirthday">生日 <span>可选</span></label>
+      <input class="dialog-input" id="personBirthday" type="date" />
+      <label class="dialog-field" for="personMetDate">认识时间 <span>可选</span></label>
+      <input class="dialog-input" id="personMetDate" type="date" />
+      </div>
+      <p class="dialog-error" id="personFormError" role="alert" hidden></p>
+      <button class="dialog-primary" id="personFormSave" type="button">保存人物</button>
+    </div>
+    <div class="form-dialog event-detail-dialog" id="tagDetail" role="dialog" aria-modal="true" aria-labelledby="tagDetailTitle" hidden>
+      <div class="form-dialog-head"><h2 id="tagDetailTitle">标签</h2><button class="dialog-close" id="tagDetailClose" type="button" aria-label="关闭">×</button></div>
+      <div class="detail-scroll">
+        <label class="dialog-field" for="tagDetailRename">改名</label>
+        <input class="dialog-input" id="tagDetailRename" type="text" maxlength="8" autocomplete="off" />
+        <p class="dialog-help">保存后，所有事件里的这个词会一起改名。输入已有词名可合并，事件会保留。</p>
+        <p class="dialog-error" id="tagDetailError" role="alert" hidden></p>
+        <button class="dialog-primary" id="tagDetailRenameSave" type="button">保存新名字</button>
+        <div class="detail-group"><span>关联人物</span><div class="detail-chips" id="tagDetailPersons"></div></div>
+        <div class="detail-group"><span>相关事件</span><ul class="taglib-events" id="tagDetailEvents"></ul></div>
+      </div>
+    </div>
+    <div class="form-dialog event-detail-dialog" id="eventDetail" role="dialog" aria-modal="true" aria-labelledby="eventDetailTitle" hidden>
+      <div class="form-dialog-head"><h2 id="eventDetailTitle">事件详情</h2><button class="dialog-close" id="eventDetailClose" type="button" aria-label="关闭">×</button></div>
+      <div class="detail-scroll">
+        <div id="eventRead">
+          <p class="detail-date" id="eventDetailDate"></p>
+          <div class="detail-text" id="eventDetailText"></div>
+          <div class="detail-group" id="eventDetailMoodGroup"><span>我当时的心情</span><strong id="eventDetailMood"></strong></div>
+          <div class="detail-group" id="eventDetailTagsGroup"><span id="eventDetailTagLabel">这件事里，对这个人的印象</span><div id="eventDetailTags"></div></div>
+        </div>
+        <div id="eventEditPanel" hidden>
+          <label class="dialog-field" for="eventEditText">事件内容</label><textarea class="dialog-input detail-edit-text" id="eventEditText"></textarea>
+          <span class="dialog-field">我当时的心情</span>
+          <div class="score" id="eventEditMood" role="group" aria-label="修改我当时的心情"></div>
+          <div class="detail-group event-edit-judgments"><span id="eventEditTagLabel">这件事里，对这个人的印象 <small>可选</small></span>
+            <div class="tag-choices" id="impressionPeople"></div><div class="tag-choices" id="eventTagChoices"></div><button class="link" id="showMoreTags" type="button">更多用词</button><input class="dialog-input" id="impressionSearch" type="search" placeholder="搜索用词" aria-label="搜索用词" hidden>
+            <button class="new-tag-trigger" id="eventTagNew" type="button">＋ 添加印象</button>
+          </div>
+          <p class="dialog-error" id="eventEditError" role="alert" hidden></p>
+        </div>
+      </div>
+      <div class="detail-actions" id="eventReadActions"><button id="eventEdit" type="button">修改 / 补充印象</button></div>
+      <div class="detail-actions" id="eventEditActions" hidden><button id="eventCancelEdit" type="button">取消</button><button id="eventSave" class="detail-save" type="button">保存修改</button></div><div class="detail-danger" id="eventDanger" hidden><button id="eventDelete" class="danger-link" type="button">删除这条事件</button></div>
+    </div>
+    <div class="form-dialog" id="eventTagForm" role="dialog" aria-modal="true" aria-labelledby="eventTagFormTitle" hidden>
+      <div class="form-dialog-head"><h2 id="eventTagFormTitle">添加印象</h2><button class="dialog-close" id="eventTagFormClose" type="button" aria-label="关闭">×</button></div>
+      <label class="dialog-field" for="eventTagInput">印象用词</label><input class="dialog-input" id="eventTagInput" type="text" maxlength="8" autocomplete="off" placeholder="例如：兑现承诺" />
+      <p class="dialog-error" id="eventTagFormError" role="alert" hidden></p>
+      <div class="delete-actions"><button id="eventTagFormCancel" type="button">取消</button><button id="eventTagAdd" class="detail-save" type="button">添加印象</button></div>
+    </div>
+    <div class="form-dialog" id="deleteConfirm" role="dialog" aria-modal="true" aria-labelledby="deleteTitle" hidden>
+      <div class="form-dialog-head"><h2 id="deleteTitle">删除这条事件？</h2><button class="dialog-close" id="deleteClose" type="button" aria-label="关闭">×</button></div>
+      <p class="dialog-help">该记录将从所有关联人物中删除，不可恢复。</p>
+      <div class="delete-actions"><button id="deleteCancel" type="button">取消</button><button id="deleteConfirmButton" type="button">确认删除</button></div>
+    </div>
+    <div class="form-dialog" id="peopleDeleteConfirm" role="dialog" aria-modal="true" aria-labelledby="peopleDeleteTitle" hidden>
+      <div class="form-dialog-head"><h2 id="peopleDeleteTitle">删除所选人物？</h2><button class="dialog-close" id="peopleDeleteClose" type="button" aria-label="关闭">×</button></div>
+      <p class="dialog-help" id="peopleDeleteImpact"></p>
+      <div class="delete-actions"><button id="peopleDeleteCancel" type="button">取消</button><button id="peopleDeleteConfirmButton" type="button">确认删除</button></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var phone = document.getElementById('phone');
+      function fit() {
+        var w = window.innerWidth, h = window.innerHeight;
+        if (w <= 420) { phone.style.transform = ''; return; }
+        var s = Math.min(1, w / 393, h / 852);
+        phone.style.transform = s < 1 ? 'scale(' + s + ')' : '';
+      }
+      window.addEventListener('resize', fit);
+      fit();
+
+      /* ── 人物数据（档案页由此渲染） ─────────────────────────────── */
+      var PEOPLE = {
+        wang: {
+          name: '小王', avatar: '王', note: '大学室友，现在同一家公司',
+          events: [
+            { date: '2026-08-25', text: '我失业那阵子，小王主动借钱给我。', tags: ['主动', '真诚'] },
+            { date: '2026-07-28', text: '我搬家那天，他提前一小时到，还自己带了工具。', tags: ['主动'] },
+            { date: '2026-07-15', text: '答应帮我介绍工作，连续两次没了下文。', tags: ['有时爽约'] },
+            { date: '2026-06-20', text: '约好周末打球，他当天临时说有事来不了。', tags: ['有时爽约'] },
+            { date: '2026-06-08', text: '我电脑坏了，他下班后留下来帮我修到很晚。', tags: ['主动'] }
+          ]
+        },
+        zhang: {
+          name: '张三', avatar: '张', note: '前同事，一起做过一个项目',
+          events: [
+            { date: '2026-09-25', text: '聚餐时他替我解围，把话题接了过去。', tags: ['仗义'] },
+            { date: '2026-08-01', text: '项目上线前，他留下来陪我改到凌晨。', tags: ['仗义', '主动'] },
+            { date: '2026-03-18', text: '他主动把我引荐给了现在的团队。', tags: ['主动'] }
+          ]
+        },
+        li: {
+          name: '李四', avatar: '李', note: '熟人，见面点头的交情',
+          events: [
+            { date: '2026-09-25', text: '聚餐时我说话，他一直在旁边嘲讽我。', tags: ['不尊重人'] },
+            { date: '2026-08-20', text: '当着别人的面，拿我以前的事开玩笑。', tags: ['不尊重人'] }
+          ]
+        }
+      };
+      var stateKey = 'guanju-prototype-people-v1';
+      try {
+        var savedPeople = JSON.parse(localStorage.getItem(stateKey) || 'null');
+        if (savedPeople && typeof savedPeople === 'object' && !Array.isArray(savedPeople)) PEOPLE = savedPeople;
+      } catch (error) {}
+      Object.keys(PEOPLE).forEach(function (id) {
+        if (!Array.isArray(PEOPLE[id].events)) PEOPLE[id].events = [];
+        if (!Array.isArray(PEOPLE[id].manualTags)) PEOPLE[id].manualTags = [];
+        if (!Array.isArray(PEOPLE[id].hiddenTags)) PEOPLE[id].hiddenTags = [];
+        PEOPLE[id].events.forEach(function (event, index) { if (!event.id) event.id = id + '-seed-' + index; });
+        try { PEOPLE[id].avatarUrl = localStorage.getItem('guanju-avatar-' + id) || ''; }
+        catch (error) { PEOPLE[id].avatarUrl = ''; }
+      });
+      var tagLibraryKey = 'guanju-prototype-tag-library-v1';
+      var tagLibrary = [];
+      Object.keys(PEOPLE).forEach(function (id) {
+        PEOPLE[id].events.forEach(function (event) {
+          (event.tags || []).concat(Object.values(event.tagsByPerson || {}).flat()).forEach(function (tag) {
+            if (!tagLibrary.includes(tag)) tagLibrary.push(tag);
+          });
+        });
+        PEOPLE[id].manualTags.forEach(function (tag) { if (!tagLibrary.includes(tag)) tagLibrary.push(tag); });
+      });
+      try {
+        var savedLibrary = JSON.parse(localStorage.getItem(tagLibraryKey) || 'null');
+        if (Array.isArray(savedLibrary)) tagLibrary = savedLibrary;
+      } catch (error) {}
+      function persistTagLibrary() {
+        try { localStorage.setItem(tagLibraryKey, JSON.stringify(tagLibrary)); }
+        catch (error) { showToast('印象用词未能保存'); }
+      }
+      function persistPeople() {
+        var snapshot = {};
+        Object.keys(PEOPLE).forEach(function (id) {
+          var p = PEOPLE[id];
+          snapshot[id] = { name: p.name, avatar: p.avatar, note: p.note, gender: p.gender || '', relation: p.relation || '', work: p.work || '', city: p.city || '', birthday: p.birthday || '', metDate: p.metDate || '', manualTags: p.manualTags || [], hiddenTags: p.hiddenTags || [], events: p.events };
+        });
+        try { localStorage.setItem(stateKey, JSON.stringify(snapshot)); }
+        catch (error) { showToast('本次修改已显示，但浏览器未能保存'); }
+      }
+      function updateOverview() {
+        var ids = {};
+        Object.keys(PEOPLE).forEach(function (id) { PEOPLE[id].events.forEach(function (event) { ids[event.id] = true; }); });
+        document.getElementById('homePeopleCount').textContent = Object.keys(PEOPLE).length;
+        document.getElementById('homeEventCount').textContent = Object.keys(ids).length;
+      }
+      updateOverview();
+
+      var content = document.getElementById('content');
+      var screenHome = document.getElementById('screenHome');
+      var screenPeople = document.getElementById('screenPeople');
+      var screenPerson = document.getElementById('screenPerson');
+      var screenTags = document.getElementById('screenTags');
+      var peopleGrid = document.getElementById('peopleGrid');
+      var navBack = document.getElementById('navBack');
+      var navTitle = document.getElementById('navTitle');
+      var tabRecords = document.getElementById('tabRecords');
+      var screenRecords = document.getElementById('screenRecords');
+      var tabHome = document.getElementById('tabHome');
+      var tabPeople = document.getElementById('tabPeople');
+      var pAvatar = document.getElementById('pAvatar');
+      var avatarFile = document.getElementById('avatarFile');
+      var pName = document.getElementById('pName');
+      var pNote = document.getElementById('pNote');
+      var tagWrap = document.getElementById('tagWrap');
+      var eventsList = document.getElementById('events');
+      var eventsTitle = document.getElementById('eventsTitle');
+      var viewPersonRecords = document.getElementById('viewPersonRecords');
+      var noSupport = document.getElementById('noSupport');
+
+      var currentPerson = 'wang';
+      var activeTag = null;
+      var personParent = 'people';
+      var peopleRows = [];
+      var managingPeople = false;
+      var selectedPeople = [];
+
+      function esc(s) {
+        return String(s).replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      }
+      function todayISO() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+      function parseEventDate(value) {
+        var parts = String(value || '').split('-');
+        if (parts.length !== 3) return NaN;
+        var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        return isNaN(d.getTime()) ? NaN : d.getTime();
+      }
+      function relativeDate(value) {
+        if (!value) return '';
+        var time = parseEventDate(value);
+        if (isNaN(time)) return value; // 旧数据的文字日期原样展示
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        var days = Math.round((today - time) / 86400000);
+        if (days <= 0) return '今天';
+        if (days === 1) return '昨天';
+        if (days < 7) return days + ' 天前';
+        if (days < 30) return Math.floor(days / 7) + ' 周前';
+        if (days < 365) return Math.max(1, Math.floor(days / 30)) + ' 个月前';
+        return Math.floor(days / 365) + ' 年前';
+      }
+      function eventSortTime(event) {
+        return event.createdAt || parseEventDate(event.date) || 0;
+      }
+      var moods = [
+        { name: '难过', face: 'M11 12v2m10-2v2M10 23q6-8 12 0' },
+        { name: '委屈', face: 'M11 12v2m10-2v2M11 22q5-5 10 0M23 17v4' },
+        { name: '生气', face: 'm9 12 4 2m10-2-4 2M11 23h10' },
+        { name: '平静', face: 'M11 12v2m10-2v2M12 21h8' },
+        { name: '开心', face: 'M11 12v2m10-2v2M11 20q5 6 10 0' },
+        { name: '感动', face: 'M11 12v2m10-2v2M11 19q5 6 10 0M22.5 12q1.5 2.5 0 4' }
+      ];
+      function normalizedMood(value) { return value === '很难过' ? '难过' : value === '很开心' ? '开心' : value || ''; }
+      function moodOptionsHTML(selected) {
+        return moods.map(function (m) {
+          return '<button class="sdot' + (selected === m.name ? ' on' : '') + '" type="button" data-mood="' + m.name + '" aria-pressed="' + (selected === m.name) + '"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12"/><path d="' + m.face + '"/></svg><span>' + m.name + '</span></button>';
+        }).join('');
+      }
+      function setMoodSelection(container, selected) {
+        Array.prototype.forEach.call(container.querySelectorAll('[data-mood]'), function (button) {
+          var on = button.dataset.mood === selected;
+          button.classList.toggle('on', on);
+          button.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }
+      function moodBadge(value) { var mood = normalizedMood(value); return mood ? '<span class="mood-badge">' + esc(mood) + '</span>' : ''; }
+      function tagsForEvent(event, personId) {
+        return event.tagsByPerson ? (event.tagsByPerson[personId] || []) : event.tags || [];
+      }
+      function tagsOf(events, manualTags, hiddenTags, personId) {
+        var order = [], counts = Object.create(null);
+        events.forEach(function (e) {
+          tagsForEvent(e, personId).forEach(function (t) {
+            if (!(t in counts)) { counts[t] = 0; order.push(t); }
+            counts[t]++;
+          });
+        });
+        return order.map(function (t) { return { name: t, count: counts[t] }; });
+      }
+
+      /* ── 屏幕切换 ──────────────────────────────────────────────── */
+      function setTab(which) {
+        [['records', tabRecords], ['home', tabHome], ['people', tabPeople]].forEach(function (entry) {
+          var active = entry[0] === which;
+          entry[1].classList.toggle('active', active);
+          if (active) entry[1].setAttribute('aria-current', 'page');
+          else entry[1].removeAttribute('aria-current');
+        });
+      }
+      var currentScreen = 'home';
+      function show(screen) {
+        screenRecords.hidden = screen !== screenRecords;
+        screenHome.hidden = screen !== screenHome;
+        screenPeople.hidden = screen !== screenPeople;
+        screenPerson.hidden = screen !== screenPerson;
+        screenTags.hidden = screen !== screenTags;
+        currentScreen = screen === screenRecords ? 'records' : screen === screenHome ? 'home' : screen === screenPeople ? 'people' : screen === screenTags ? 'tags' : 'person';
+        content.scrollTop = 0;
+      }
+      function goRecords(personId) {
+        recordsPersonId = typeof personId === 'string' && PEOPLE[personId] ? personId : '';
+        show(screenRecords);
+        navBack.hidden = true;
+        navTitle.textContent = '念隅里';
+        setTab('records');
+        renderAllRecords();
+      }
+      function goHome() {
+        show(screenHome);
+        navBack.hidden = true;
+        navTitle.textContent = '念隅里';
+        setTab('home');
+      }
+      function goPeople() {
+        show(screenPeople);
+        navBack.hidden = true;
+        navTitle.textContent = '念隅里';
+        setTab('people');
+      }
+      function goTags() {
+        renderTagLibrary();
+        show(screenTags);
+        navBack.hidden = false;
+        navTitle.textContent = '印象用词';
+        setTab('people');
+      }
+      function goBack() {
+        if (currentScreen === 'tags') {
+          goPeople();
+          return;
+        }
+        if (personParent === 'tags') { goTags(); openTagDetail(selectedTagName); return; }
+        if (personParent === 'home') goHome(); else if (personParent === 'records') goRecords(); else goPeople();
+      }
+
+      /* ── 人物卡片栅格 ──────────────────────────────────────────── */
+      function renderPeople() {
+        var html = '';
+        Object.keys(PEOPLE).forEach(function (id) {
+          var p = PEOPLE[id];
+          var tags = tagsOf(p.events, p.manualTags, p.hiddenTags, id).slice(0, 2);
+          html +=
+            '<li><button class="pcard' + (selectedPeople.includes(id) ? ' selected' : '') + '" type="button" data-person-id="' + id + '" data-name="' + esc(p.name) + '" aria-pressed="' + (managingPeople && selectedPeople.includes(id)) + '" data-od-id="pcard-' + id + '">' +
+              '<span class="pcard-top"><span class="avatar">' + (p.avatarUrl ? '<img src="' + esc(p.avatarUrl) + '" alt="">' : esc(p.avatar)) + '</span><span class="pcard-name">' + esc(p.name) + '</span></span>' +
+              '<span class="pcard-note">' + esc((p.note || '').split('·').map(function (s) { return s.trim(); }).filter(Boolean).join('，')) + '</span>' +
+              '<span class="pcard-tags">' + tags.map(function (t) { return '<span class="chip">' + esc(t.name) + '</span>'; }).join('') + '</span>' +
+              '<span class="pcard-count">' + p.events.length + ' 条事件</span>' + (managingPeople ? '<span class="pcard-check">' + (selectedPeople.includes(id) ? '✓ 已选' : '选择') + '</span>' : '') +
+            '</button></li>';
+        });
+        html +=
+          '<li><button class="pcard new" id="createPerson" type="button" data-od-id="pcard-new">' +
+            '<span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>' +
+            '<span>新建人物</span>' +
+          '</button></li>';
+        peopleGrid.innerHTML = html;
+
+        peopleRows = Array.prototype.slice.call(peopleGrid.querySelectorAll('.pcard[data-person-id]'));
+        peopleRows.forEach(function (c) {
+          c.addEventListener('click', function () { var id = c.getAttribute('data-person-id'); if (managingPeople) { selectedPeople = selectedPeople.includes(id) ? selectedPeople.filter(function (item) { return item !== id; }) : selectedPeople.concat(id); updateManageBar(); renderPeople(); } else openPerson(id, 'people'); });
+        });
+        document.getElementById('createPerson').addEventListener('click', function () { openPersonForm('create'); });
+        var query = document.getElementById('personSearch').value.trim();
+        if (query) peopleRows.forEach(function (row) { row.closest('li').hidden = row.getAttribute('data-name').indexOf(query) === -1; });
+        document.getElementById('noResult').hidden = !query || peopleRows.some(function (row) { return !row.closest('li').hidden; });
+      }
+
+      function updateManageBar() {
+        document.getElementById('manageBar').hidden = !managingPeople;
+        document.getElementById('selectedCount').textContent = '已选 ' + selectedPeople.length + ' 人';
+        document.getElementById('deleteSelectedPeople').disabled = !selectedPeople.length;
+        document.getElementById('managePeople').hidden = managingPeople;
+      }
+      document.getElementById('managePeople').addEventListener('click', function () {
+        managingPeople = !managingPeople;
+        selectedPeople = [];
+        updateManageBar(); renderPeople();
+      });
+      document.getElementById('cancelManage').addEventListener('click', function () {
+        managingPeople = false; selectedPeople = []; updateManageBar(); renderPeople();
+      });
+      document.getElementById('deleteSelectedPeople').addEventListener('click', function () {
+        if (!selectedPeople.length) return;
+        var impact = eventEntries().reduce(function (result, entry) {
+          var ids = eventPeople(entry.event, entry.ownerId);
+          if (!ids.some(function (id) { return selectedPeople.includes(id); })) return result;
+          if (ids.every(function (id) { return selectedPeople.includes(id); })) result.removed++;
+          else result.kept++;
+          return result;
+        }, { removed: 0, kept: 0 });
+        document.getElementById('peopleDeleteTitle').textContent = '删除所选 ' + selectedPeople.length + ' 位人物？';
+        document.getElementById('peopleDeleteImpact').textContent = '人物档案和照片会删除。仅关联所选人物的 ' + impact.removed + ' 条事件会删除；另有 ' + impact.kept + ' 条多人事件会保留，并移除所选人物的关联与印象。删除后无法恢复。';
+        openDialog(document.getElementById('peopleDeleteConfirm'), document.getElementById('peopleDeleteCancel'));
+      });
+      document.getElementById('peopleDeleteClose').addEventListener('click', function () { closeDialog(); });
+      document.getElementById('peopleDeleteCancel').addEventListener('click', function () { closeDialog(); });
+      document.getElementById('peopleDeleteConfirmButton').addEventListener('click', function () {
+        if (!selectedPeople.length) return;
+        selectedPeople.forEach(function (id) {
+          Object.keys(PEOPLE).forEach(function (otherId) {
+            PEOPLE[otherId].events.forEach(function (event) {
+              if (event.peopleIds) event.peopleIds = event.peopleIds.filter(function (personId) { return personId !== id; });
+              if (event.tagsByPerson) delete event.tagsByPerson[id];
+            });
+          });
+          delete PEOPLE[id];
+          try { localStorage.removeItem('guanju-avatar-' + id); } catch (error) {}
+        });
+        managingPeople = false; selectedPeople = [];
+        closeDialog(false);
+        updateManageBar(); refreshEventViews();
+        showToast('人物已删除');
+      });
+      /* ── 档案页渲染 ────────────────────────────────────────────── */
+      function renderPerson(id) {
+        currentPerson = id;
+        var p = PEOPLE[id];
+        var avatarPhoto = pAvatar.querySelector('.avatar-photo');
+        pAvatar.querySelector('.avatar-letter').textContent = p.avatar || p.name.slice(0, 1);
+        pAvatar.querySelector('.avatar-letter').hidden = !!p.avatarUrl;
+        avatarPhoto.hidden = !p.avatarUrl;
+        if (p.avatarUrl) avatarPhoto.src = p.avatarUrl;
+        pName.textContent = p.name;
+        var noteText = (p.note || '').split('·').map(function (s) { return s.trim(); }).filter(Boolean).join('\n');
+        pNote.textContent = noteText || '还没有备注';
+        var basics = [];
+        if (p.gender) basics.push(['性别', p.gender]);
+        if (p.relation) basics.push(['关系', p.relation]);
+        if (p.work) basics.push(['工作', p.work]);
+        if (p.city) basics.push(['城市', p.city]);
+        if (p.birthday) basics.push(['生日', p.birthday]);
+        if (p.metDate) basics.push(['认识于', p.metDate]);
+        var basicNode = document.getElementById('pBasics');
+        basicNode.innerHTML = basics.map(function (b) {
+          return '<span class="basic-chip"><span class="basic-label">' + esc(b[0]) + '</span>' + esc(b[1]) + '</span>';
+        }).join('');
+        basicNode.hidden = !basics.length;
+
+        tagWrap.innerHTML = '';
+        var personTags = tagsOf(p.events, p.manualTags, p.hiddenTags, id);
+        tagWrap.classList.toggle('dense', personTags.length > 6);
+        tagWrap.classList.toggle('very-dense', personTags.length > 12);
+        personTags.forEach(function (t) {
+          var b = document.createElement('button');
+          b.className = 'tag-btn';
+          b.type = 'button';
+          b.setAttribute('data-tag', t.name);
+          b.setAttribute('aria-pressed', 'false');
+          b.innerHTML = '<span>' + esc(t.name) + '</span><span class="tag-count">' + t.count + '</span>';
+          tagWrap.appendChild(b);
+        });
+        if (!tagWrap.childNodes.length) tagWrap.innerHTML = '<p class="guide">还没有事件印象。打开一条事件，即可补充本次印象。</p>';
+
+        eventsList.innerHTML = '';
+        p.events.forEach(function (e, index) {
+          var li = document.createElement('li');
+          li.innerHTML =
+            '<button class="event" type="button" data-event-index="' + index + '">' +
+              '<span class="event-top">' +
+                '<span class="event-date">' + esc(relativeDate(e.date)) + '</span>' +
+                '<span class="emotion">' + moodBadge(e.mood) + '</span>' +
+              '</span>' +
+              '<span class="event-text">' + esc(e.text) + '</span>' +
+              '<span class="event-meta">' +
+                tagsForEvent(e, id).map(function (t) { return '<span class="tchip">' + esc(t) + '</span>'; }).join('') +
+              '</span>' +
+            '</button>';
+          eventsList.appendChild(li);
+        });
+        applyFilter(null);
+      }
+
+      function openPerson(id, parent) {
+        if (!PEOPLE[id]) return;
+        personParent = parent === 'tags' ? 'tags' : parent === 'home' ? 'home' : 'people';
+        renderPerson(id);
+        show(screenPerson);
+        navBack.hidden = false;
+        navTitle.textContent = '人际档案';
+        setTab('people');
+      }
+
+      pAvatar.addEventListener('click', function () { avatarFile.click(); });
+      avatarFile.addEventListener('change', function () {
+        var file = avatarFile.files && avatarFile.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('请选择图片'); return; }
+        var image = new Image();
+        var url = URL.createObjectURL(file);
+        image.onload = function () {
+          var canvas = document.createElement('canvas');
+          canvas.width = canvas.height = 320;
+          var side = Math.min(image.width, image.height);
+          canvas.getContext('2d').drawImage(image, (image.width - side) / 2, (image.height - side) / 2, side, side, 0, 0, 320, 320);
+          PEOPLE[currentPerson].avatarUrl = canvas.toDataURL('image/jpeg', 0.82);
+          try { localStorage.setItem('guanju-avatar-' + currentPerson, PEOPLE[currentPerson].avatarUrl); }
+          catch (error) { showToast('照片已显示，但浏览器未能保存'); }
+          renderPerson(currentPerson);
+          renderPeople();
+          URL.revokeObjectURL(url);
+          avatarFile.value = '';
+        };
+        image.onerror = function () { URL.revokeObjectURL(url); showToast('图片读取失败'); };
+        image.src = url;
+      });
+
+      /* ── 标签筛选（标签回溯） ──────────────────────────────────── */
+      function applyFilter(tag) {
+        activeTag = tag || null;
+        var shown = 0;
+        var visible = 0;
+        Array.prototype.forEach.call(tagWrap.querySelectorAll('.tag-btn'), function (b) {
+          var on = b.getAttribute('data-tag') === activeTag;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        Array.prototype.forEach.call(eventsList.querySelectorAll('.event'), function (ev) {
+          var event = PEOPLE[currentPerson].events[Number(ev.dataset.eventIndex)];
+          var tags = event ? tagsForEvent(event, currentPerson) : [];
+          var hit = !activeTag || tags.indexOf(activeTag) > -1;
+          if (hit) shown++;
+          var display = hit && (activeTag || visible < 3);
+          ev.closest('li').hidden = !display;
+          if (display) visible++;
+        });
+        eventsTitle.textContent = '最近事件';
+        noSupport.innerHTML = activeTag ? '没有符合这个印象的事件。再点一次印象词，回到最近事件。' : '还没有事件。点「记一件事」写下重要的相处。';
+        noSupport.hidden = shown > 0;
+      }
+
+      tagWrap.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-tag]');
+        if (!b || !tagWrap.contains(b)) return;
+        var tag = b.getAttribute('data-tag');
+        applyFilter(activeTag === tag ? null : tag);
+      });
+      viewPersonRecords.addEventListener('click', function () { goRecords(currentPerson); });
+
+      /* ── 人物页：卡片栅格 + 搜索 ──────────────────────────────── */
+      renderPeople();
+      var search = document.getElementById('personSearch');
+      var noResult = document.getElementById('noResult');
+      search.addEventListener('input', function () {
+        var q = search.value.trim(), shown = 0;
+        peopleRows.forEach(function (p) {
+          var hit = !q || p.getAttribute('data-name').indexOf(q) > -1;
+          p.closest('li').hidden = !hit;
+          if (hit) shown++;
+        });
+        noResult.hidden = shown > 0;
+      });
+
+      /* ── 导航绑定 ──────────────────────────────────────────────── */
+      navBack.addEventListener('click', goBack);
+      tabRecords.addEventListener('click', function () { goRecords(); });
+      tabHome.addEventListener('click', goHome);
+      tabPeople.addEventListener('click', goPeople);
+      document.getElementById('homePeopleLink').addEventListener('click', goPeople);
+
+      /* ── toast（事件委托，兼容动态生成内容） ──────────────────── */
+      var toast = document.getElementById('toast'), tt;
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(tt);
+        tt = setTimeout(function () { toast.classList.remove('show'); }, 1900);
+      }
+      document.addEventListener('click', function (e) {
+        var el = e.target.closest('[data-toast]');
+        if (el) showToast(el.getAttribute('data-toast'));
+      });
+
+      /* ── 人物、判断标签与事件详情 ──────────────────────────────── */
+      var formBackdrop = document.getElementById('formBackdrop');
+      var personForm = document.getElementById('personForm');
+      var eventDetail = document.getElementById('eventDetail');
+      var activeDialog = null;
+      var dialogTrigger = null;
+      var personFormMode = 'create';
+      function openDialog(dialog, focusTarget) {
+        dialogTrigger = document.activeElement;
+        activeDialog = dialog;
+        formBackdrop.hidden = false;
+        dialog.hidden = false;
+        (window.matchMedia('(pointer: coarse)').matches ? dialog.querySelector('.dialog-close') : focusTarget || dialog.querySelector('.dialog-close')).focus();
+      }
+      function closeDialog(restoreFocus) {
+        if (!activeDialog) return;
+        activeDialog.hidden = true;
+        formBackdrop.hidden = true;
+        activeDialog = null;
+        if (restoreFocus !== false) {
+          if (dialogTrigger && document.contains(dialogTrigger) && !dialogTrigger.closest('[hidden]')) dialogTrigger.focus();
+          else if (!screenPerson.hidden) eventsList.focus();
+          else tabHome.focus();
+        }
+        dialogTrigger = null;
+      }
+      function showFieldError(element, message) {
+        element.textContent = message;
+        element.hidden = false;
+      }
+      function openPersonForm(mode) {
+        personFormMode = mode;
+        var p = mode === 'edit' ? PEOPLE[currentPerson] : null;
+        document.getElementById('personAdvanced').hidden = mode !== 'edit';
+        document.getElementById('personFormTitle').textContent = p ? '编辑人物资料' : '新建人物';
+        document.getElementById('personFormSave').textContent = p ? '保存修改' : '创建人物';
+        document.getElementById('personName').value = p ? p.name : '';
+        document.getElementById('personNote').value = p ? p.note || '' : '';
+        document.getElementById('personGender').value = p ? p.gender || '' : '';
+        document.getElementById('personRelation').value = p ? p.relation || '' : '';
+        document.getElementById('personWork').value = p ? p.work || '' : '';
+        document.getElementById('personCity').value = p ? p.city || '' : '';
+        document.getElementById('personBirthday').value = p ? p.birthday || '' : '';
+        document.getElementById('personMetDate').value = p ? p.metDate || '' : '';
+        document.getElementById('personFormError').hidden = true;
+        openDialog(personForm, document.getElementById('personName'));
+      }
+      document.getElementById('editPerson').addEventListener('click', function () { openPersonForm('edit'); });
+      document.getElementById('personFormClose').addEventListener('click', function () { closeDialog(); });
+      document.getElementById('personName').addEventListener('input', function () { document.getElementById('personFormError').hidden = true; });
+      document.getElementById('personName').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('personFormSave').click(); } });
+      document.getElementById('personFormSave').addEventListener('click', function () {
+        var name = document.getElementById('personName').value.trim();
+        var note = document.getElementById('personNote').value.trim();
+        var gender = document.getElementById('personGender').value;
+        var relation = document.getElementById('personRelation').value.trim();
+        var work = document.getElementById('personWork').value.trim();
+        var city = document.getElementById('personCity').value.trim();
+        var birthday = document.getElementById('personBirthday').value;
+        var metDate = document.getElementById('personMetDate').value;
+        var error = document.getElementById('personFormError');
+        if (!name) { showFieldError(error, '填写人物名字后再保存。'); document.getElementById('personName').focus(); return; }
+        var exists = Object.keys(PEOPLE).some(function (id) { return PEOPLE[id].name === name && (personFormMode === 'create' || id !== currentPerson); });
+        if (exists) { showFieldError(error, '这个名字已有档案，换个称呼便于区分。'); document.getElementById('personName').focus(); return; }
+        if (personFormMode === 'create') {
+          var id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+          PEOPLE[id] = { name: name, avatar: name.slice(0, 1), note: note, gender: gender, relation: relation, work: work, city: city, birthday: birthday, metDate: metDate, events: [], manualTags: [], hiddenTags: [], avatarUrl: '' };
+          persistPeople();
+          updateOverview();
+          renderPeople();
+          closeDialog(false);
+          openPerson(id, 'people');
+          showToast('人物已创建');
+        } else {
+          var person = PEOPLE[currentPerson];
+          var oldName = person.name;
+          person.name = name;
+          person.note = note;
+          person.gender = gender;
+          person.relation = relation;
+          person.work = work;
+          person.city = city;
+          person.birthday = birthday;
+          person.metDate = metDate;
+          if (!person.avatarUrl) person.avatar = name.slice(0, 1);
+          Array.prototype.forEach.call(recentList.querySelectorAll('.who'), function (node) { if (node.textContent.trim() === oldName) node.textContent = name; });
+          Array.prototype.forEach.call(document.querySelectorAll('.person-token[data-person-id="' + currentPerson + '"]'), function (token) { token.firstChild.nodeValue = name; });
+          persistPeople();
+          renderPerson(currentPerson);
+          renderPeople();
+          renderRecent();
+          closeDialog();
+          showToast('资料已更新');
+        }
+      });
+      document.getElementById('addJudgment').addEventListener('click', goTags);
+      /* ── 印象用词页 ────────────────────────────────────────────── */
+      var tagLibList = document.getElementById('tagLibList');
+      var libNewTag = document.getElementById('libNewTag');
+      var libAddTag = document.getElementById('libAddTag');
+      var libError = document.getElementById('libError');
+      var tagDetail = document.getElementById('tagDetail');
+      var selectedTagName = '';
+      function renameTagsInList(list, oldName, newName) {
+        return Array.from(new Set((list || []).map(function (tag) { return tag === oldName ? newName : tag; })));
+      }
+      function tagUsage(tag) {
+        var persons = [], events = [], seen = {};
+        Object.keys(PEOPLE).forEach(function (id) {
+          var p = PEOPLE[id], count = 0;
+          p.events.forEach(function (event) {
+            if (tagsForEvent(event, id).indexOf(tag) === -1) return;
+            count++;
+            if (!seen[event.id]) { seen[event.id] = { event: event, who: p.name }; events.push(seen[event.id]); }
+            else { seen[event.id].who += '、' + p.name; }
+          });
+          if (count > 0) persons.push({ id: id, name: p.name, count: count });
+        });
+        events.sort(function (a, b) { return eventSortTime(b.event) - eventSortTime(a.event); });
+        return { persons: persons, events: events };
+      }
+      function renderTagLibrary() {
+        tagLibList.innerHTML = tagLibrary.length ? tagLibrary.map(function (tag) {
+          var use = tagUsage(tag);
+          return '<li><button class="taglib-row" type="button" data-lib-tag="' + esc(tag) + '">' +
+            '<span class="name">' + esc(tag) + '</span>' +
+            '<span class="use">' + use.persons.length + ' 人 · ' + use.events.length + ' 条事件</span>' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>' +
+            '</button></li>';
+        }).join('') : '<li><p class="empty boxed">还没有印象用词。可在上方新增，也可在事件里添加。</p></li>';
+      }
+      tagLibList.addEventListener('click', function (e) {
+        var row = e.target.closest('[data-lib-tag]');
+        if (!row) return;
+        openTagDetail(row.dataset.libTag);
+      });
+      function openTagDetail(tag) {
+        selectedTagName = tag;
+        var use = tagUsage(tag);
+        document.getElementById('tagDetailTitle').textContent = tag;
+        document.getElementById('tagDetailRename').value = tag;
+        document.getElementById('tagDetailError').hidden = true;
+        document.getElementById('tagDetailPersons').innerHTML = use.persons.length ? use.persons.map(function (p) {
+          return '<button type="button" class="detail-chip" data-tag-person="' + esc(p.id) + '">' + esc(p.name) + ' · ' + p.count + ' 条 →</button>';
+        }).join('') : '<span class="manage-empty">还没有人物使用这个词</span>';
+        document.getElementById('tagDetailEvents').innerHTML = use.events.length ? use.events.map(function (entry) {
+          return '<li><span class="e-head"><span>' + esc(relativeDate(entry.event.date)) + '</span><span>' + esc(entry.who) + '</span></span><span class="e-text">' + esc(entry.event.text || '') + '</span></li>';
+        }).join('') : '<span class="manage-empty">还没有使用这个词的事件</span>';
+        openDialog(tagDetail, document.getElementById('tagDetailRename'));
+      }
+      document.getElementById('tagDetailPersons').addEventListener('click', function (e) {
+        var button = e.target.closest('[data-tag-person]');
+        if (!button) return;
+        closeDialog(false);
+        openPerson(button.dataset.tagPerson, 'tags');
+        applyFilter(selectedTagName);
+      });
+      document.getElementById('tagDetailClose').addEventListener('click', function () { closeDialog(); });
+      document.getElementById('tagDetailRename').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('tagDetailRenameSave').click(); } });
+      document.getElementById('tagDetailRenameSave').addEventListener('click', function () {
+        var name = document.getElementById('tagDetailRename').value.trim();
+        var error = document.getElementById('tagDetailError');
+        if (!name) { showFieldError(error, '填写新的印象用词。'); return; }
+        var merging = name !== selectedTagName && tagLibrary.includes(name);
+        if (name !== selectedTagName) {
+          tagLibrary = renameTagsInList(tagLibrary, selectedTagName, name);
+          Object.keys(PEOPLE).forEach(function (id) {
+            var person = PEOPLE[id];
+            person.manualTags = renameTagsInList(person.manualTags, selectedTagName, name);
+            person.hiddenTags = renameTagsInList(person.hiddenTags, selectedTagName, name);
+            person.events.forEach(function (event) {
+              event.tags = renameTagsInList(event.tags, selectedTagName, name);
+              if (event.tagsByPerson) Object.keys(event.tagsByPerson).forEach(function (personId) {
+                event.tagsByPerson[personId] = renameTagsInList(event.tagsByPerson[personId], selectedTagName, name);
+              });
+            });
+          });
+          persistTagLibrary();
+          refreshEventViews();
+        }
+        openTagDetail(name);
+        renderTagLibrary();
+        showToast(merging ? '已合并用词，相关事件已保留' : '已改名，所有记录同步更新');
+      });
+      libNewTag.addEventListener('input', function () { libError.hidden = true; });
+      libNewTag.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); libAddTag.click(); } });
+      libAddTag.addEventListener('click', function () {
+        var name = libNewTag.value.trim();
+        if (!name) { showFieldError(libError, '写下印象用词后再添加。'); libNewTag.focus(); return; }
+        if (tagLibrary.includes(name)) { showFieldError(libError, '词库中已有这个印象词。'); libNewTag.focus(); return; }
+        tagLibrary.push(name);
+        persistTagLibrary();
+        libNewTag.value = '';
+        renderTagLibrary();
+        showToast('已加入词库');
+      });
+      document.getElementById('eventDetailClose').addEventListener('click', function () { closeDialog(); });
+      formBackdrop.addEventListener('click', function () {
+        if (activeDialog === document.getElementById('deleteConfirm')) cancelDelete();
+        else if (activeDialog === document.getElementById('eventTagForm')) returnToEventEdit();
+        else closeDialog();
+      });
+      var recentList = document.getElementById('recentList');
+      var currentEventId = null;
+      var currentEventPersonId = null;
+      function eventEntries() {
+        var seen = Object.create(null), entries = [];
+        Object.keys(PEOPLE).forEach(function (id) {
+          PEOPLE[id].events.forEach(function (event) {
+            if (seen[event.id]) return;
+            seen[event.id] = true;
+            entries.push({ event: event, ownerId: id });
+          });
+        });
+        return entries;
+      }
+      function findEvent(id) {
+        return eventEntries().find(function (entry) { return entry.event.id === id; }) || null;
+      }
+      function eventPeople(event, ownerId) { return event.peopleIds && event.peopleIds.length ? event.peopleIds : [ownerId]; }
+      function updateEventCopies(id, update) {
+        Object.keys(PEOPLE).forEach(function (personId) { PEOPLE[personId].events.forEach(function (event) { if (event.id === id) update(event, personId); }); });
+      }
+      function refreshEventViews() {
+        persistPeople();
+        updateOverview();
+        renderPeople();
+        renderRecent();
+        renderAllRecords();
+        if (!screenPerson.hidden && PEOPLE[currentPerson]) { var previousFilter = activeTag; renderPerson(currentPerson); applyFilter(previousFilter); }
+      }
+      function renderRecent() {
+        var entries = eventEntries().sort(function (a, b) {
+          return eventSortTime(b.event) - eventSortTime(a.event);
+        }).slice(0, 3);
+        recentList.innerHTML = entries.map(function (entry) {
+          var event = entry.event, ids = eventPeople(event, entry.ownerId);
+          return '<li><button class="event" type="button" data-event-id="' + esc(event.id) + '" data-owner-id="' + esc(entry.ownerId) + '">' +
+            '<span class="event-top"><span class="event-date">' + esc(relativeDate(event.date)) + '</span><span class="emotion">' + moodBadge(event.mood) + '</span></span>' +
+            '<span class="event-text">' + esc(event.text || '') + '</span><span class="event-meta">' +
+            ids.map(function (id) { return '<span class="meta-chip"><span class="who">' + esc(PEOPLE[id] ? PEOPLE[id].name : id) + '</span></span>'; }).join('') +
+            '</span></button></li>';
+        }).join('');
+      }
+      var recordsShown = 20;
+      var recordsPersonId = '';
+      function renderAllRecords() {
+        var query = document.getElementById('recordSearch').value.trim().toLowerCase();
+        var start = document.getElementById('recordStart').value;
+        var end = document.getElementById('recordEnd').value;
+        var entries = eventEntries().sort(function (a, b) { return eventSortTime(b.event) - eventSortTime(a.event); }).filter(function (entry) {
+          var event = entry.event;
+          var names = eventPeople(event, entry.ownerId).map(function (id) { return PEOPLE[id] ? PEOPLE[id].name : ''; }).join(' ');
+          var words = [event.text || '', names, (event.tags || []).join(' '), Object.values(event.tagsByPerson || {}).flat().join(' ')].join(' ').toLowerCase();
+          return (!recordsPersonId || eventPeople(event, entry.ownerId).includes(recordsPersonId)) && (!query || words.includes(query)) && (!start || event.date >= start) && (!end || event.date <= end);
+        });
+        document.getElementById('recordPersonScope').hidden = !recordsPersonId;
+        document.getElementById('recordPersonName').textContent = recordsPersonId && PEOPLE[recordsPersonId] ? '关于' + PEOPLE[recordsPersonId].name + '的全部事件' : '';
+        document.getElementById('recordsEmpty').hidden = !!entries.length;
+        document.getElementById('recordsMore').hidden = entries.length <= recordsShown;
+        document.getElementById('allRecords').innerHTML = entries.slice(0, recordsShown).map(function (entry) {
+          var event = entry.event, ids = eventPeople(event, entry.ownerId);
+          return '<li><button class="event" type="button" data-event-id="' + esc(event.id) + '" data-owner-id="' + esc(entry.ownerId) + '">' +
+            '<span class="event-top"><span class="event-date">' + esc(relativeDate(event.date)) + '</span><span class="emotion">' + moodBadge(event.mood) + '</span></span>' +
+            '<span class="event-text">' + esc(event.text || '') + '</span><span class="event-meta">' +
+            ids.map(function (id) { return PEOPLE[id] ? '<span class="meta-chip"><span class="who">' + esc(PEOPLE[id].name) + '</span></span>' : ''; }).join('') +
+            '</span></button></li>';
+        }).join('');
+      }
+      ['recordSearch', 'recordStart', 'recordEnd'].forEach(function (id) {
+        document.getElementById(id).addEventListener(id === 'recordSearch' ? 'input' : 'change', function () { recordsShown = 20; renderAllRecords(); });
+      });
+      document.getElementById('recordClearDates').addEventListener('click', function () {
+        document.getElementById('recordStart').value = '';
+        document.getElementById('recordEnd').value = '';
+        recordsShown = 20; renderAllRecords();
+      });
+      document.getElementById('recordShowEveryone').addEventListener('click', function () { recordsPersonId = ''; recordsShown = 20; renderAllRecords(); });
+      document.getElementById('recordsMore').addEventListener('click', function () { recordsShown += 20; renderAllRecords(); });
+      content.addEventListener('scroll', function () {
+        if (currentScreen === 'records' && !document.getElementById('recordsMore').hidden && content.scrollTop + content.clientHeight >= content.scrollHeight - 100) {
+          recordsShown += 20;
+          renderAllRecords();
+        }
+      });
+      document.getElementById('allRecords').addEventListener('click', function (e) {
+        var button = e.target.closest('[data-event-id]');
+        if (button) showEventDetail(button.dataset.eventId, button.dataset.ownerId);
+      });
+      var draftEventTags = {};
+      var draftNewTags = [];
+      var expandedTags = false;
+      function renderEventTags() {
+        var found = findEvent(currentEventId);
+        if (!found) return;
+        document.getElementById('eventDetailTagLabel').textContent = '这件事里，对每个人的印象';
+        document.getElementById('eventDetailTags').innerHTML = eventPeople(found.event, found.ownerId).map(function (id) {
+          var tags = tagsForEvent(found.event, id);
+          return '<p>' + esc(PEOPLE[id].name) + '</p><div class="detail-chips">' + (tags.length ? tags.map(function (tag) { return '<span class="detail-chip">' + esc(tag) + '</span>'; }).join('') : '<span class="manage-empty">尚未补充</span>') + '</div>';
+        }).join('');
+      }
+
+      function renderTagChoices() {
+        document.getElementById('eventEditTagLabel').textContent = '这件事里，对' + PEOPLE[currentEventPersonId].name + '的印象（可选）';
+        var selected = draftEventTags[currentEventPersonId] || [];
+        var query = document.getElementById('impressionSearch').value.trim();
+        var available = Array.from(new Set(selected.concat(tagLibrary, draftNewTags)));
+        var choices = query ? available.filter(function (tag) { return tag.includes(query); }) : expandedTags ? available : selected.concat(available.filter(function (tag) { return !selected.includes(tag); }).slice(0, Math.max(0, 4 - selected.length)));
+        document.getElementById('impressionSearch').hidden = !expandedTags;
+        document.getElementById('showMoreTags').textContent = expandedTags ? '收起用词' : '更多用词';
+        document.getElementById('eventTagChoices').innerHTML = choices.length ? choices.map(function (tag) {
+          return '<button type="button" data-choice="' + esc(tag) + '" aria-pressed="' + selected.includes(tag) + '">' + esc(tag) + '</button>';
+        }).join('') : '<span class="manage-empty">没有匹配的用词，可在下方添加</span>';
+      }
+      function returnToEventEdit() {
+        closeDialog(false);
+        openDialog(eventDetail, document.getElementById('eventTagNew'));
+      }
+      function renderEventDetail() {
+        var found = findEvent(currentEventId);
+        if (!found) { closeDialog(); return; }
+        var event = found.event;
+        var ids = eventPeople(event, found.ownerId);
+        if (!ids.includes(currentEventPersonId)) currentEventPersonId = ids[0];
+        document.getElementById('eventDetailTitle').textContent = '事件详情';
+        document.getElementById('eventDetailDate').textContent = relativeDate(event.date) || '未填写日期';
+        document.getElementById('eventDetailText').textContent = event.text || '';
+        document.getElementById('eventDetailMood').textContent = normalizedMood(event.mood);
+        document.getElementById('eventDetailMoodGroup').hidden = !event.mood;
+        renderEventTags();
+        document.getElementById('eventRead').hidden = false;
+        document.getElementById('eventEditPanel').hidden = true;
+        document.getElementById('eventReadActions').hidden = false;
+        document.getElementById('eventEditActions').hidden = true;
+        document.getElementById('eventDanger').hidden = true;
+      }
+      function showEventDetail(id, personId) {
+        currentEventId = id;
+        currentEventPersonId = personId;
+        renderEventDetail();
+        eventDetail.querySelector('.detail-scroll').scrollTop = 0;
+        if (activeDialog !== eventDetail) openDialog(eventDetail);
+      }
+      eventsList.addEventListener('click', function (e) {
+        var button = e.target.closest('.event');
+        if (!button) return;
+        var event = PEOPLE[currentPerson].events[Number(button.dataset.eventIndex)];
+        if (event) showEventDetail(event.id, currentPerson);
+      });
+      recentList.addEventListener('click', function (e) {
+        var button = e.target.closest('[data-event-id]');
+        if (button) showEventDetail(button.dataset.eventId, button.dataset.ownerId);
+      });
+      document.getElementById('eventEditMood').addEventListener('click', function (e) {
+        var button = e.target.closest('[data-mood]');
+        if (!button) return;
+        var selected = button.classList.contains('on') ? '' : button.dataset.mood;
+        setMoodSelection(document.getElementById('eventEditMood'), selected);
+      });
+      function renderImpressionPeople() {
+        document.getElementById('impressionPeople').innerHTML = Object.keys(draftEventTags).map(function (id) {
+          return '<button type="button" data-impression-person="' + esc(id) + '" aria-pressed="' + (id === currentEventPersonId) + '">' + esc(PEOPLE[id].name) + '</button>';
+        }).join('');
+      }
+      document.getElementById('impressionSearch').addEventListener('input', renderTagChoices);
+      document.getElementById('showMoreTags').addEventListener('click', function () { expandedTags = !expandedTags; document.getElementById('impressionSearch').value = ''; renderTagChoices(); });
+      document.getElementById('impressionPeople').addEventListener('click', function (e) {
+        var button = e.target.closest('[data-impression-person]');
+        if (!button) return;
+        currentEventPersonId = button.dataset.impressionPerson;
+        document.getElementById('impressionSearch').value = '';
+        renderImpressionPeople();
+        renderTagChoices();
+      });
+      document.getElementById('eventTagChoices').addEventListener('click', function (e) {
+        var button = e.target.closest('[data-choice]');
+        if (!button) return;
+        var tag = button.dataset.choice;
+        var selected = draftEventTags[currentEventPersonId] || [];
+        draftEventTags[currentEventPersonId] = selected.includes(tag) ? selected.filter(function (item) { return item !== tag; }) : selected.concat(tag);
+        renderTagChoices();
+      });
+      document.getElementById('eventTagNew').addEventListener('click', function () {
+        document.getElementById('eventTagInput').value = '';
+        document.getElementById('eventTagFormError').hidden = true;
+        closeDialog(false);
+        openDialog(document.getElementById('eventTagForm'), document.getElementById('eventTagInput'));
+      });
+      document.getElementById('eventTagFormClose').addEventListener('click', returnToEventEdit);
+      document.getElementById('eventTagFormCancel').addEventListener('click', returnToEventEdit);
+      document.getElementById('eventTagInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('eventTagAdd').click(); } });
+      document.getElementById('eventTagAdd').addEventListener('click', function () {
+        var input = document.getElementById('eventTagInput');
+        var name = input.value.trim();
+        if (!name) { showFieldError(document.getElementById('eventTagFormError'), '填写印象用词。'); input.focus(); return; }
+        if (!tagLibrary.includes(name) && !draftNewTags.includes(name)) draftNewTags.push(name);
+        if (!draftEventTags[currentEventPersonId].includes(name)) draftEventTags[currentEventPersonId].push(name);
+        renderTagChoices();
+        returnToEventEdit();
+      });
+      document.getElementById('eventEdit').addEventListener('click', function () {
+        var found = findEvent(currentEventId);
+        if (!found) return;
+        var ids = eventPeople(found.event, found.ownerId);
+        draftEventTags = {};
+        draftNewTags = [];
+        expandedTags = false;
+        document.getElementById('impressionSearch').value = '';
+        ids.forEach(function (id) { draftEventTags[id] = tagsForEvent(found.event, id).slice(); });
+        if (!ids.includes(currentEventPersonId)) currentEventPersonId = ids[0];
+        renderImpressionPeople();
+        renderTagChoices();
+        document.getElementById('eventEditText').value = found.event.text || '';
+        var editMood = normalizedMood(found.event.mood);
+        document.getElementById('eventEditMood').innerHTML = moodOptionsHTML(editMood);
+        document.getElementById('eventEditError').hidden = true;
+        document.getElementById('eventDetailTitle').textContent = '修改事件';
+        document.getElementById('eventRead').hidden = true;
+        document.getElementById('eventEditPanel').hidden = false;
+        document.getElementById('eventReadActions').hidden = true;
+        document.getElementById('eventEditActions').hidden = false;
+        document.getElementById('eventDanger').hidden = false;
+        if (!window.matchMedia('(pointer: coarse)').matches) document.getElementById('eventEditText').focus();
+      });
+      document.getElementById('eventCancelEdit').addEventListener('click', renderEventDetail);
+      document.getElementById('eventSave').addEventListener('click', function () {
+        var text = document.getElementById('eventEditText').value.trim();
+        if (!text) { showFieldError(document.getElementById('eventEditError'), '写下事件内容后再保存。'); return; }
+        var mood = document.querySelector('#eventEditMood .sdot.on');
+        mood = mood ? mood.dataset.mood : '';
+        updateEventCopies(currentEventId, function (event) {
+          event.text = text;
+          event.mood = mood;
+          event.tagsByPerson = Object.assign({}, draftEventTags);
+          event.tags = [];
+        });
+        Object.keys(draftEventTags).forEach(function (id) {
+          if (PEOPLE[id]) PEOPLE[id].hiddenTags = PEOPLE[id].hiddenTags.filter(function (tag) { return !draftEventTags[id].includes(tag); });
+        });
+        tagLibrary = Array.from(new Set(tagLibrary.concat(Object.values(draftEventTags).flat()))); persistTagLibrary();
+        refreshEventViews();
+        renderEventDetail();
+        showToast('事件已更新');
+      });
+      document.getElementById('eventDelete').addEventListener('click', function () {
+        closeDialog(false);
+        openDialog(document.getElementById('deleteConfirm'));
+      });
+      function cancelDelete() {
+        closeDialog(false);
+        if (findEvent(currentEventId)) showEventDetail(currentEventId, currentEventPersonId);
+      }
+      document.getElementById('deleteClose').addEventListener('click', cancelDelete);
+      document.getElementById('deleteCancel').addEventListener('click', cancelDelete);
+      document.getElementById('deleteConfirmButton').addEventListener('click', function () {
+        var id = currentEventId;
+        Object.keys(PEOPLE).forEach(function (personId) {
+          PEOPLE[personId].events = PEOPLE[personId].events.filter(function (event) { return event.id !== id; });
+        });
+        closeDialog(false);
+        refreshEventViews();
+        showToast('事件已删除');
+      });
+      renderRecent();
+
+      /* ── 快速记录弹层 ──────────────────────────────────────────── */
+      var backdrop = document.getElementById('sheetBackdrop');
+      var sheet = document.getElementById('sheet');
+      var sheetError = document.getElementById('sheetError');
+      var textarea = document.getElementById('eventText');
+      var personAdd = document.getElementById('personAdd');
+      var personPicker = document.getElementById('personPicker');
+      var personPickerBackdrop = document.getElementById('personPickerBackdrop');
+      var personPickerClose = document.getElementById('personPickerClose');
+      var personPickerSearch = document.getElementById('personPickerSearch');
+      var personPickerList = document.getElementById('personPickerList');
+      var personPickerDone = document.getElementById('personPickerDone');
+      var personSummary = document.getElementById('personSummary');
+      var missingPersonBackdrop = document.getElementById('missingPersonBackdrop');
+      var missingPersonDialog = document.getElementById('missingPersonDialog');
+      var missingPersonMessage = document.getElementById('missingPersonMessage');
+      var missingPersonSkip = document.getElementById('missingPersonSkip');
+      var pendingPeople = [];
+      var missingPeople = [];
+      var unknownPeople = [];
+      var insertionRange = null;
+      var quickMood = document.getElementById('quickMood');
+      var chosenMood = '';
+      quickMood.innerHTML = moodOptionsHTML('');
+
+      function linkedPeople() {
+        return Array.from(new Set(Array.prototype.map.call(textarea.querySelectorAll('.person-token'), function (token) { return token.dataset.personId; })));
+      }
+      function makePersonToken(id) {
+        var token = document.createElement('span');
+        token.className = 'person-token';
+        token.contentEditable = 'false';
+        token.dataset.personId = id;
+        token.innerHTML = esc(PEOPLE[id].name) + '<button type="button" aria-label="删除' + esc(PEOPLE[id].name) + '">×</button>';
+        return token;
+      }
+      function plainTextNodes() {
+        var nodes = [];
+        var walker = document.createTreeWalker(textarea, NodeFilter.SHOW_TEXT, {
+          acceptNode: function (node) { return node.parentElement.closest('.person-token') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+        });
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        return nodes;
+      }
+      function unlinkedNamesInText() {
+        var linked = linkedPeople();
+        var nodes = plainTextNodes();
+        return Object.keys(PEOPLE).filter(function (id) { return linked.indexOf(id) === -1 && nodes.some(function (node) { return node.nodeValue.indexOf(PEOPLE[id].name) !== -1; }); });
+      }
+      /* 未建档人名识别：原型级启发式 —— 「老/小/阿+姓」或「姓+总/老师/医生/经理/哥/姐/叔/阿姨」 */
+      var SURNAME_CHARS = '王李张刘陈杨黄赵吴周徐孙马朱胡郭何林罗郑梁谢宋唐许韩冯邓曹彭曾肖田董袁潘蒋蔡余杜叶程苏魏吕丁任沈姚卢姜崔钟谭陆汪范金石廖贾夏韦付方白邹孟熊秦邱江尹薛闫段雷侯龙史陶黎贺顾毛郝龚邵万钱严覃武戴莫孔向汤伟明辉军强磊斌';
+      var unknownNameRegex = new RegExp('(?:老|小|阿)([' + SURNAME_CHARS + '])|([' + SURNAME_CHARS + '])(?:总|老师|医生|经理|哥|姐|叔|阿姨)', 'g');
+      function unknownNamesInText() {
+        var knownNames = Object.keys(PEOPLE).map(function (id) { return PEOPLE[id].name; });
+        var text = plainTextNodes().map(function (node) { return node.nodeValue; }).join('');
+        knownNames.forEach(function (name) { text = text.split(name).join('\u3000'); });
+        var found = [], match;
+        unknownNameRegex.lastIndex = 0;
+        while ((match = unknownNameRegex.exec(text)) !== null) {
+          if (found.indexOf(match[0]) === -1) found.push(match[0]);
+        }
+        return found;
+      }
+      function hasEventDescription() {
+        var eventCopy = textarea.cloneNode(true);
+        Array.prototype.forEach.call(eventCopy.querySelectorAll('.person-token'), function (token) { token.remove(); });
+        return !!eventCopy.textContent.trim();
+      }
+      function eventPlainText() {
+        function read(node) {
+          if (node.nodeType === Node.TEXT_NODE) return node.nodeValue;
+          if (node.nodeType !== Node.ELEMENT_NODE) return '';
+          if (node.classList.contains('person-token')) return PEOPLE[node.dataset.personId].name;
+          if (node.tagName === 'BR') return '\n';
+          var value = Array.prototype.map.call(node.childNodes, read).join('');
+          return node.tagName === 'DIV' || node.tagName === 'P' ? value + '\n' : value;
+        }
+        return Array.prototype.map.call(textarea.childNodes, read).join('').replace(/\u00a0/g, ' ').trim();
+      }
+      function linkFirstNameInText(id) {
+        var name = PEOPLE[id].name;
+        var nodes = plainTextNodes();
+        for (var i = 0; i < nodes.length; i++) {
+          var offset = nodes[i].nodeValue.indexOf(name);
+          if (offset === -1) continue;
+          var range = document.createRange();
+          range.setStart(nodes[i], offset);
+          range.setEnd(nodes[i], offset + name.length);
+          range.deleteContents();
+          range.insertNode(makePersonToken(id));
+          return;
+        }
+      }
+      function closeMissingPersonDialog() {
+        missingPersonBackdrop.hidden = true;
+        missingPersonDialog.hidden = true;
+        missingPeople = [];
+      }
+      function updatePersonSummary() {
+        var ids = linkedPeople();
+        personSummary.textContent = ids.length ? '已关联 ' + ids.map(function (id) { return PEOPLE[id].name; }).join('、') : '至少关联 1 人';
+      }
+      function rememberCaret() {
+        var selection = window.getSelection();
+        if (selection.rangeCount && textarea.contains(selection.anchorNode)) insertionRange = selection.getRangeAt(0).cloneRange();
+      }
+      function closePersonPicker(restoreFocus) {
+        personPicker.hidden = true;
+        personPickerBackdrop.hidden = true;
+        personAdd.setAttribute('aria-expanded', 'false');
+        pendingPeople = [];
+        if (restoreFocus !== false && sheet.classList.contains('show')) personAdd.focus();
+      }
+      function renderPersonPicker() {
+        var term = personPickerSearch.value.trim();
+        personPickerList.innerHTML = '';
+        Object.keys(PEOPLE).filter(function (id) { return PEOPLE[id].name.indexOf(term) !== -1; }).forEach(function (id) {
+          var option = document.createElement('button');
+          option.type = 'button';
+          option.dataset.personId = id;
+          option.className = 'person-option' + (pendingPeople.indexOf(id) !== -1 ? ' active' : '');
+          option.setAttribute('aria-pressed', pendingPeople.indexOf(id) !== -1 ? 'true' : 'false');
+          option.innerHTML = '<span>' + esc(PEOPLE[id].name) + '</span><span class="check" aria-hidden="true">' + (pendingPeople.indexOf(id) !== -1 ? '✓' : '') + '</span>';
+          option.addEventListener('click', function () {
+            closePersonPicker(false);
+            insertPeople([id]);
+          });
+          personPickerList.appendChild(option);
+        });
+        if (!personPickerList.childNodes.length) personPickerList.innerHTML = '<span class="person-picker-empty">没有找到人物</span>';
+        personPickerDone.textContent = pendingPeople.length ? '插入所选人物（' + pendingPeople.length + '）' : '请选择人物';
+        personPickerDone.disabled = !pendingPeople.length;
+        personPickerDone.hidden = true;
+      }
+      function insertPeople(ids) {
+        textarea.focus();
+        var selection = window.getSelection();
+        var range = insertionRange && textarea.contains(insertionRange.commonAncestorContainer) ? insertionRange : document.createRange();
+        if (!insertionRange || !textarea.contains(range.commonAncestorContainer)) { range.selectNodeContents(textarea); range.collapse(false); }
+        range.deleteContents();
+        ids.forEach(function (id, index) {
+          if (index) { var separator = document.createTextNode(' '); range.insertNode(separator); range.setStartAfter(separator); range.collapse(true); }
+          var token = makePersonToken(id);
+          range.insertNode(token);
+          range.setStartAfter(token);
+          range.collapse(true);
+        });
+        var space = document.createTextNode('\u00a0');
+        range.insertNode(space);
+        range.setStartAfter(space);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        insertionRange = range.cloneRange();
+        updatePersonSummary();
+        sheetError.classList.remove('show');
+      }
+      textarea.addEventListener('keyup', rememberCaret);
+      textarea.addEventListener('mouseup', rememberCaret);
+      textarea.addEventListener('input', function () { rememberCaret(); updatePersonSummary(); });
+      textarea.addEventListener('click', function (event) {
+        if (!event.target.matches('.person-token button')) return;
+        event.preventDefault();
+        event.target.closest('.person-token').remove();
+        insertionRange = null;
+        updatePersonSummary();
+      });
+      personAdd.addEventListener('click', function () {
+        if (!personPicker.hidden) { closePersonPicker(); return; }
+        rememberCaret();
+        pendingPeople = [];
+        personPickerSearch.value = '';
+        renderPersonPicker();
+        personPicker.hidden = false;
+        personPickerBackdrop.hidden = false;
+        personAdd.setAttribute('aria-expanded', 'true');
+        if (window.matchMedia('(pointer: coarse)').matches) personPickerClose.focus();
+        else personPickerSearch.focus();
+      });
+      personPickerSearch.addEventListener('input', renderPersonPicker);
+      personPickerDone.addEventListener('click', function () { if (pendingPeople.length) { insertPeople(pendingPeople); closePersonPicker(false); } });
+      personPickerClose.addEventListener('click', function () { closePersonPicker(); });
+      personPickerBackdrop.addEventListener('click', function () { closePersonPicker(); });
+
+      function openSheet(preselect) {
+        backdrop.classList.add('show');
+        sheet.classList.add('show');
+        if (preselect) { var id = Object.keys(PEOPLE).filter(function (key) { return PEOPLE[key].name === preselect; })[0]; if (id && linkedPeople().indexOf(id) === -1) insertPeople([id]); }
+        if (!window.matchMedia('(pointer: coarse)').matches) setTimeout(function () { textarea.focus(); }, 280);
+      }
+      function closeSheet() {
+        backdrop.classList.remove('show');
+        sheet.classList.remove('show');
+        closePersonPicker(false);
+        closeMissingPersonDialog();
+        closeUnknownPersonDialog();
+      }
+      document.getElementById('quickRecord').addEventListener('click', function () { openSheet(null); });
+      document.getElementById('recordForPerson').addEventListener('click', function () {
+        openSheet(PEOPLE[currentPerson].name);
+      });
+      document.getElementById('sheetClose').addEventListener('click', closeSheet);
+      backdrop.addEventListener('click', closeSheet);
+      document.addEventListener('keydown', function (e) {
+        if (activeDialog && e.key === 'Tab') {
+          var dialogControls = Array.prototype.slice.call(activeDialog.querySelectorAll('button:not(:disabled), input, textarea, select')).filter(function (control) { return control.getClientRects().length > 0; });
+          var dialogFirst = dialogControls[0], dialogLast = dialogControls[dialogControls.length - 1];
+          if (e.shiftKey && document.activeElement === dialogFirst) { e.preventDefault(); dialogLast.focus(); }
+          else if (!e.shiftKey && document.activeElement === dialogLast) { e.preventDefault(); dialogFirst.focus(); }
+          return;
+        }
+        if (!personPicker.hidden && e.key === 'Tab') {
+          var controls = Array.prototype.slice.call(personPicker.querySelectorAll('button:not(:disabled), input'));
+          var first = controls[0], last = controls[controls.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          return;
+        }
+        if (e.key !== 'Escape') return;
+        if (activeDialog) {
+          if (activeDialog === document.getElementById('deleteConfirm')) cancelDelete();
+          else if (activeDialog === document.getElementById('eventTagForm')) returnToEventEdit();
+          else closeDialog();
+          return;
+        }
+        if (!missingPersonDialog.hidden) { closeMissingPersonDialog(); return; }
+        if (!unknownPersonDialog.hidden) { closeUnknownPersonDialog(); return; }
+        if (!personPicker.hidden) { closePersonPicker(); return; }
+        closeSheet();
+      });
+      quickMood.addEventListener('click', function (e) {
+        var button = e.target.closest('[data-mood]');
+        if (!button) return;
+        chosenMood = chosenMood === button.dataset.mood ? '' : button.dataset.mood;
+        setMoodSelection(quickMood, chosenMood);
+      });
+
+      function doSave() {
+        if (!hasEventDescription()) {
+          sheetError.textContent = '写点什么，哪怕一句话。';
+          sheetError.classList.add('show');
+          textarea.focus();
+          return;
+        }
+        if (!linkedPeople().length) {
+          sheetError.textContent = '至少关联一个人物。';
+          sheetError.classList.add('show');
+          return;
+        }
+        var ids = linkedPeople();
+        var now = Date.now();
+        var event = {
+          id: 'e' + now.toString(36) + Math.random().toString(36).slice(2, 5), date: todayISO(),
+          mood: chosenMood,
+          text: eventPlainText(), tags: [],
+          peopleIds: ids, createdAt: now
+        };
+        ids.forEach(function (id) { PEOPLE[id].events.unshift(event); });
+        persistPeople();
+        updateOverview();
+        renderPeople();
+        renderRecent();
+        renderAllRecords();
+        if (!screenPerson.hidden) renderPerson(currentPerson);
+        closeSheet();
+        showToast('已保存，可在事件详情补充印象');
+        showEventDetail(event.id, ids[0]);
+        textarea.replaceChildren();
+        insertionRange = null;
+        updatePersonSummary();
+        chosenMood = '';
+        setMoodSelection(quickMood, '');
+        sheetError.textContent = '';
+        sheetError.classList.remove('show');
+      }
+      function finishSave() {
+        var missing = unlinkedNamesInText();
+        if (missing.length) {
+          missingPersonMessage.textContent = '正文提到了「' + missing.map(function (id) { return PEOPLE[id].name; }).join('、') + '」，但还没有关联对应人物。要关联后再保存吗？';
+          missingPersonSkip.hidden = !linkedPeople().length;
+          missingPersonBackdrop.hidden = false;
+          missingPersonDialog.hidden = false;
+          document.getElementById('missingPersonConfirm').focus();
+          return;
+        }
+        unknownPeople = unknownNamesInText();
+        if (unknownPeople.length) {
+          document.getElementById('unknownPersonMessage').textContent = '正文提到了「' + unknownPeople.join('、') + '」，还没有档案。要现在建一个吗？也可以保存后再补。';
+          unknownPersonBackdrop.hidden = false;
+          unknownPersonDialog.hidden = false;
+          document.getElementById('unknownPersonConfirm').focus();
+          return;
+        }
+        doSave();
+      }
+      document.getElementById('sheetSave').addEventListener('click', function () {
+        if (!hasEventDescription()) {
+          sheetError.textContent = '写点什么，哪怕一句话。';
+          sheetError.classList.add('show');
+          textarea.focus();
+          return;
+        }
+        finishSave();
+      });
+      var unknownPersonBackdrop = document.getElementById('unknownPersonBackdrop');
+      var unknownPersonDialog = document.getElementById('unknownPersonDialog');
+      function closeUnknownPersonDialog() {
+        unknownPersonBackdrop.hidden = true;
+        unknownPersonDialog.hidden = true;
+        unknownPeople = [];
+      }
+      document.getElementById('unknownPersonConfirm').addEventListener('click', function () {
+        var now = Date.now();
+        var newIds = unknownPeople.map(function (name, index) {
+          var id = 'p' + now.toString(36) + index.toString(36) + Math.random().toString(36).slice(2, 5);
+          PEOPLE[id] = { name: name, avatar: name.slice(0, 1), note: '', gender: '', relation: '', work: '', city: '', birthday: '', metDate: '', events: [], manualTags: [], hiddenTags: [], avatarUrl: '' };
+          return id;
+        });
+        renderPeople();
+        updateOverview();
+        persistPeople();
+        newIds.forEach(linkFirstNameInText);
+        insertionRange = null;
+        updatePersonSummary();
+        closeUnknownPersonDialog();
+        finishSave();
+      });
+      document.getElementById('unknownPersonSkip').addEventListener('click', function () { closeUnknownPersonDialog(); doSave(); });
+      document.getElementById('unknownPersonCancel').addEventListener('click', closeUnknownPersonDialog);
+      unknownPersonBackdrop.addEventListener('click', closeUnknownPersonDialog);
+      document.getElementById('missingPersonConfirm').addEventListener('click', function () {
+        missingPeople.forEach(linkFirstNameInText);
+        insertionRange = null;
+        updatePersonSummary();
+        closeMissingPersonDialog();
+        finishSave();
+      });
+      missingPersonSkip.addEventListener('click', function () { closeMissingPersonDialog(); finishSave(); });
+      document.getElementById('missingPersonCancel').addEventListener('click', closeMissingPersonDialog);
+      missingPersonBackdrop.addEventListener('click', closeMissingPersonDialog);
+
+      /* ── URL 直达：#p=wang&tag=主动 ────────────────────────────── */
+      (function () {
+        var h = location.hash.replace(/^#/, '');
+        if (!h) return;
+        var params = {};
+        h.split('&').forEach(function (kv) {
+          var i = kv.indexOf('=');
+          if (i > 0) params[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1));
+        });
+        if (params.tab === 'people') { goPeople(); return; }
+        if (params.tab === 'records') { goRecords(); return; }
+        var pid = PEOPLE[params.p] ? params.p : (params.tag ? 'wang' : null);
+        if (!pid) return;
+        openPerson(pid);
+        if (params.tag) {
+          var target = null;
+          Array.prototype.forEach.call(tagWrap.querySelectorAll('.tag-btn'), function (b) {
+            if (b.getAttribute('data-tag') === params.tag) target = params.tag;
+          });
+          if (target) applyFilter(target);
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>

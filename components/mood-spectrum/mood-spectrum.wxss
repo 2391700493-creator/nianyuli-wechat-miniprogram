@@ -1,0 +1,20 @@
+.spectrum-readout { display: flex; align-items: center; gap: 16rpx; min-height: 60rpx; margin: 0 4rpx 16rpx; }
+.spectrum-dot { flex: none; width: 28rpx; height: 28rpx; border-radius: 50%; background: #d6d3cf; }
+.spectrum-name { font-size: 30rpx; font-weight: 600; color: #1d1d1f; line-height: 1.2; }
+.spectrum-name.empty { color: #a8a5a0; font-weight: 400; font-size: 27rpx; }
+.spectrum-track { position: relative; display: flex; align-items: center; height: 72rpx; }
+.spectrum-rail { position: relative; width: 100%; height: 20rpx; border-radius: 999rpx; box-shadow: inset 0 0 0 1rpx rgba(0,0,0,.06); }
+.spectrum-stop { position: absolute; top: 50%; width: 10rpx; height: 10rpx; border-radius: 50%; background: rgba(255,255,255,.9); box-shadow: 0 0 0 1rpx rgba(0,0,0,.12); transform: translate(-50%, -50%); }
+.spectrum-thumb { position: absolute; top: 50%; left: 0; display: flex; align-items: center; justify-content: center; width: 48rpx; height: 48rpx; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2rpx rgba(0,0,0,.08), 0 6rpx 16rpx rgba(0,0,0,.18); transform: translate(-50%, -50%) scale(1); transition: left 180ms cubic-bezier(0.32, 0.72, 0, 1), transform 180ms cubic-bezier(0.32, 0.72, 0, 1), opacity 150ms ease-out; pointer-events: none; }
+.spectrum-track.dragging .spectrum-thumb { transition: opacity 150ms ease-out; }
+.spectrum-thumb.empty { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+.spectrum-thumb-inner { width: 24rpx; height: 24rpx; border-radius: 50%; }
+.spectrum-hint { margin: 12rpx 4rpx 0; color: #a8a5a0; font-size: 24rpx; }
+
+.spectrum-options { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 12rpx; }
+.spectrum-option { margin: 0; padding: 10rpx 16rpx; border: 1rpx solid #d6d3cf; border-radius: 12rpx; font-size: 24rpx; line-height: 1.5; background: transparent; color: #55524b; }
+.spectrum-option::after { border: 0; }
+.spectrum-option.selected { background: #eae5dc; border-color: #817b72; color: #1d1d1f; }
+.spectrum-option:focus-visible { outline: 3rpx solid #817b72; outline-offset: 3rpx; }
+
+.button-pressed { opacity: .7; }

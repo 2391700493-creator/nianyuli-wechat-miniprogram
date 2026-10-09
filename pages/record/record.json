@@ -1,0 +1,5 @@
+{
+  "backgroundColor": "#ffffff",
+  "disableScroll": true,
+  "usingComponents": { "mood-manager": "/components/mood-manager/mood-manager" }
+}

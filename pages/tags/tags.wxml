@@ -1,0 +1,12 @@
+<view class="page">
+  <view class="hero"><view class="hero-title">印象用词</view><view class="hero-desc">停用后不再出现在新记录中，已有记录保留。</view></view>
+  <view class="add-row"><input maxlength="8" aria-label="印象词" bindblur="blurInput" focus="{{focusField === 'name'}}" cursor-spacing="24" disabled="{{busy || loading || loadFailed}}" placeholder="添加印象词" value="{{name}}" confirm-type="done" bindinput="changeName" bindconfirm="add" placeholder-class="text-entry-placeholder" /><button hover-class="button-pressed" disabled="{{busy || loading || loadFailed}}" bindtap="add">{{busy ? '处理中…' : '添加'}}</button></view>
+  <view wx:if="{{loading}}" class="empty">加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="empty">加载失败，请检查网络。<button hover-class="button-pressed" class="retry" bindtap="retryLoad">重试</button></view>
+  <view wx:elif="{{!tags.length}}" class="empty">还没有印象词。</view>
+  <block wx:else>
+  <view wx:for="{{tags}}" wx:key="name" class="tag-row"><text class="tag-name {{!item.active ? 'inactive' : ''}}">{{item.name}}</text><button hover-class="button-pressed" disabled="{{busy || loading || loadFailed}}" data-name="{{item.name}}" bindtap="startRename">改名</button><button hover-class="button-pressed" disabled="{{busy || loading || loadFailed}}" data-name="{{item.name}}" bindtap="toggle">{{item.active ? '停用' : '启用'}}</button><button hover-class="button-pressed" class="delete" disabled="{{busy || loading || loadFailed}}" data-name="{{item.name}}" bindtap="remove">删除</button></view>
+  </block>
+  <view wx:if="{{renaming}}" class="rename-overlay" bindtap="cancelRename"></view>
+  <view wx:if="{{renaming}}" class="rename-sheet"><view class="rename-title">修改“{{renaming}}”</view><input aria-label="新名字" bindblur="blurInput" focus="{{focusField === 'newName'}}" cursor-spacing="24" disabled="{{busy || loading || loadFailed}}" value="{{newName}}" maxlength="8" confirm-type="done" bindinput="changeNewName" bindconfirm="saveRename" placeholder-class="text-entry-placeholder" /><view class="rename-help">保存后，已有事件里的这个词会一起改名。</view><view class="rename-actions"><button hover-class="button-pressed" disabled="{{busy || loading || loadFailed}}" bindtap="cancelRename">取消</button><button hover-class="button-pressed" disabled="{{busy || loading || loadFailed}}" bindtap="saveRename">{{busy ? '保存中…' : '保存新名字'}}</button></view></view>
+</view>

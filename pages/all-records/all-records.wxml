@@ -1,0 +1,30 @@
+<view class="page records-page">
+  <include src="records-filter.wxml" />
+  <view class="list-summary"><text>{{hasFilters ? '筛选结果' : '按时间回看'}} · {{filteredCount}} 条记录</text><button hover-class="button-pressed" wx:if="{{hasFilters}}" class="reset-filters" bindtap="clearFilters">清除筛选</button></view>
+  <scroll-view class="records-scroll" scroll-y scroll-top="{{scrollTop}}" bindscrolltolower="loadMore" lower-threshold="120">
+    <view wx:if="{{loading}}" class="empty">加载中…</view>
+    <view wx:elif="{{loadFailed}}" class="empty">加载失败，请检查网络。<button hover-class="button-pressed" class="retry" bindtap="retryLoad">重试</button></view>
+    <view wx:elif="{{!events.length}}" class="empty">
+      <view>{{hasFilters ? (startDate ? dateLabel + '没有符合条件的记录' : '没有找到相关记录') : '还没有记录'}}</view>
+      <view class="empty-note">{{hasFilters ? '可以换个日期，或清除筛选查看全部。' : '点下方“记一件事”，写下第一件事。'}}</view>
+      <button hover-class="button-pressed" wx:if="{{hasFilters}}" class="empty-reset" bindtap="clearFilters">查看全部记录</button>
+    </view>
+    <view wx:else class="record-list">
+      <view wx:for="{{events}}" wx:key="id" class="record-row {{index === events.length - 1 ? 'record-row-last' : ''}}">
+        <button hover-class="button-pressed" class="record-entry" data-id="{{item.id}}" bindtap="openEvent">
+          <view class="entry-marker" style="{{item.moodColor ? 'border-color:' + item.moodColor : ''}}"></view>
+          <view class="entry-content">
+            <view wx:if="{{item.showDate}}" class="record-date">{{item.dateText}}</view>
+            <text class="event-text">{{item.text}}</text>
+            <view wx:if="{{item.person}}" class="event-meta"><text class="person-link">{{item.person}}</text></view>
+            <view wx:if="{{item.tagsText}}" class="event-tags">{{item.tagsText}}</view>
+          </view>
+        </button>
+        <view wx:if="{{item.showDivider}}" class="record-divider" aria-hidden="true"></view>
+      </view>
+      <button hover-class="button-pressed" wx:if="{{hasMore}}" class="more-button" bindtap="loadMore">加载更多记录</button>
+      <view wx:else class="list-end">已显示全部{{filteredCount}}条记录</view>
+    </view>
+  </scroll-view>
+  <button hover-class="button-pressed" class="record-button" bindtap="record">记一件事</button>
+</view>

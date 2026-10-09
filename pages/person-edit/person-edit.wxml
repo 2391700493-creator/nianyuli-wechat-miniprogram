@@ -1,0 +1,67 @@
+<view class="page edit-page">
+  <view wx:if="{{loading}}" class="empty">加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="empty">加载失败，请检查网络。<button hover-class="button-pressed" class="primary retry" bindtap="retryLoad">重试</button></view>
+  <view wx:else class="edit-content">
+    <view class="portrait">
+      <image wx:if="{{avatarUrl}}" class="avatar photo" src="{{avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="avatar">{{nameInitial}}</view>
+      <view class="identity">
+        <input aria-label="姓名" bindblur="blurInput" focus="{{focusField === 'name'}}" cursor-spacing="80" disabled="{{saving}}" class="name-input" value="{{name}}" data-field="name" bindinput="change" maxlength="30" placeholder="填写姓名" placeholder-class="ph text-entry-placeholder" />
+        <text class="name-label">姓名</text>
+      </view>
+    </view>
+
+    <view class="field-group">
+      <view class="group-heading">我与 TA</view>
+      <view class="field-row">
+        <text class="field-label">与我的关系</text>
+        <input class="field-input" aria-label="与我的关系" bindblur="blurInput" focus="{{focusField === 'relation'}}" cursor-spacing="80" disabled="{{saving}}" value="{{relation}}" data-field="relation" bindinput="change" maxlength="40" placeholder="例如：大学同学" placeholder-class="ph text-entry-placeholder" />
+      </view>
+      <view class="date-field">
+        <picker disabled="{{saving}}" mode="date" value="{{metDate}}" data-field="metDate" bindchange="change" aria-label="认识时间">
+          <view class="field-row">
+            <text class="field-label">认识时间</text>
+            <text class="field-value {{metDate ? '' : 'ph'}}">{{metDate || '选择日期'}}</text>
+            <view class="chevron" aria-hidden="true"></view>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="field-group">
+      <view class="group-heading"><text>补充资料</text><text class="optional">选填</text></view>
+      <view class="field-row">
+        <text class="field-label">职业</text>
+        <input class="field-input" aria-label="职业" bindblur="blurInput" focus="{{focusField === 'work'}}" cursor-spacing="80" disabled="{{saving}}" value="{{work}}" data-field="work" bindinput="change" maxlength="40" placeholder="填写职业" placeholder-class="ph text-entry-placeholder" />
+      </view>
+      <view class="field-row">
+        <text class="field-label">所在城市</text>
+        <input class="field-input" aria-label="所在城市" bindblur="blurInput" focus="{{focusField === 'city'}}" cursor-spacing="80" disabled="{{saving}}" value="{{city}}" data-field="city" bindinput="change" maxlength="40" placeholder="填写城市" placeholder-class="ph text-entry-placeholder" />
+      </view>
+      <view class="date-field">
+        <picker disabled="{{saving}}" mode="date" value="{{birthday}}" data-field="birthday" bindchange="change" aria-label="生日">
+          <view class="field-row">
+            <text class="field-label">生日</text>
+            <text class="field-value {{birthday ? '' : 'ph'}}">{{birthday || '选择日期'}}</text>
+            <view class="chevron" aria-hidden="true"></view>
+          </view>
+        </picker>
+      </view>
+      <picker disabled="{{saving}}" range="{{genders}}" value="{{genderIndex}}" bindchange="changeGender" aria-label="性别">
+        <view class="field-row">
+          <text class="field-label">性别</text>
+          <text class="field-value {{gender ? '' : 'ph'}}">{{gender || '不填写'}}</text>
+          <view class="chevron" aria-hidden="true"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="note-field">
+      <view class="field-label">备注</view>
+      <textarea disable-default-padding="{{true}}" class="note-input" aria-label="备注" bindblur="blurInput" focus="{{focusField === 'note'}}" cursor-spacing="80" disabled="{{saving}}" value="{{note}}" data-field="note" bindinput="change" maxlength="200" auto-height placeholder="记下你想记住的事" placeholder-class="ph text-entry-placeholder" />
+    </view>
+    <view class="save-area">
+      <button hover-class="button-pressed" class="save" disabled="{{saving}}" bindtap="save">{{saving ? '保存中…' : '保存资料'}}</button>
+    </view>
+  </view>
+</view>

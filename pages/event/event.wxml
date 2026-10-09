@@ -1,0 +1,117 @@
+<view class="nav {{editing ? 'nav-edit' : ''}}" style="padding-top:{{statusBarHeight}}px">
+  <view class="nav-inner" style="height:{{navBarHeight}}px">
+    <view class="nav-side">
+      <button wx:if="{{!editing}}" class="nav-back" hover-class="nav-pressed" bindtap="goBack" aria-label="返回"><view class="nav-chevron"></view></button>
+      <button disabled="{{saving || deleting}}" wx:if="{{editing}}" class="nav-action" hover-class="nav-pressed" bindtap="cancelEdit">取消</button>
+    </view>
+    <text class="nav-title">{{editing ? '编辑事件' : '事件详情'}}</text>
+    <view class="nav-side right"></view>
+  </view>
+</view>
+
+<view class="page {{editing ? 'page-edit' : ''}}" style="padding-top:{{statusBarHeight + navBarHeight + 12}}px">
+  <view wx:if="{{loading}}" class="empty">加载中…</view>
+  <view wx:elif="{{loadFailed}}" class="empty">加载失败，请检查网络。<button hover-class="button-pressed" class="primary retry" bindtap="retryLoad">重试</button></view>
+  <block wx:else>
+    <view wx:if="{{tagSyncFailed || tagSyncing}}" class="mood-sync-status"><text>{{tagSyncing ? '词库同步中…' : '事件已保存，词库未同步'}}</text><button hover-class="button-pressed" disabled="{{tagSyncing}}" bindtap="retryTagSync">重试同步</button></view>
+    <view wx:if="{{!editing}}" class="view-page">
+      <view class="context-line">{{viewContext}}</view>
+      <view class="paper">
+        <text class="event-text">{{event.text}}</text>
+        <view wx:if="{{event.mood}}" class="view-mood"><view class="seg-dot" style="background:{{viewMoodColor}}"></view><text>当时的心情 · {{event.mood}}</text></view>
+      </view>
+      <view class="block-head"><text class="block-title">对 TA 的印象</text></view>
+      <view class="people-card">
+        <block wx:for="{{impressions}}" wx:key="id">
+          <view class="prow">
+            <image wx:if="{{item.avatarUrl}}" class="prow-avatar photo" src="{{item.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="prow-avatar">{{item.avatar}}</view>
+            <view class="prow-main"><text class="prow-name">{{item.name}}</text><text class="prow-imps">{{item.tagsText}}</text></view>
+          </view>
+          <view wx:if="{{index < impressions.length - 1}}" class="psep"></view>
+        </block>
+      </view>
+      <button class="primary" hover-class="pill-pressed" bindtap="edit">修改事件</button>
+    </view>
+
+    <view wx:else class="edit-page">
+      <view class="context-line">{{editContext}}</view>
+      <view class="paper {{inputFocused ? 'paper-focus' : ''}}">
+        <textarea aria-label="事件内容" focus="{{focusField === 'text'}}" cursor-spacing="24" disabled="{{saving || deleting}}" class="paper-input" value="{{text}}" bindinput="changeText" bindfocus="onTextFocus" bindblur="onTextBlur" maxlength="1000" auto-height placeholder="写下来，帮以后的自己想起这一天…" disable-default-padding placeholder-class="text-entry-placeholder" />
+        <text wx:if="{{text.length}}" class="paper-count {{text.length > 900 ? 'warn' : ''}}">{{text.length}}<text class="paper-count-limit">/1000</text></text>
+      </view>
+
+      <button hover-class="button-pressed" class="mood-summary" disabled="{{saving || deleting}}" bindtap="openMoodPicker" aria-label="当时的心情，{{mood || '未选择'}}">
+        <text class="mood-label">当时的心情</text>
+        <view class="mood-value"><view wx:if="{{mood}}" class="mood-dot" style="background:{{selectedMoodColor}}"></view><text class="{{mood ? '' : 'mood-placeholder'}}">{{mood || '选择心情'}}</text><view class="chevron"></view></view>
+      </button>
+      <view wx:if="{{moodSyncState === 'syncing' || moodSyncState === 'failed'}}" class="mood-sync-status"><text>{{moodSyncState === 'syncing' ? '心情设置同步中…' : '心情设置未同步，改动已暂存'}}</text><button hover-class="button-pressed" wx:if="{{moodSyncState === 'failed'}}" bindtap="retryMoodSync">重试</button></view>
+      <view class="block-head"><text class="block-title">关联人物</text><button hover-class="button-pressed" disabled="{{saving || deleting}}" class="people-add" bindtap="openPersonPicker" aria-label="添加或移除关联人物">＋ 添加</button></view>
+      <view class="people-card">
+        <block wx:for="{{peopleRows}}" wx:key="id">
+          <button disabled="{{saving || deleting}}" class="prow tap" hover-class="prow-pressed" data-id="{{item.id}}" bindtap="openTagPickerFor">
+            <image wx:if="{{item.avatarUrl}}" class="prow-avatar photo" src="{{item.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="prow-avatar">{{item.avatar}}</view>
+            <view class="prow-main"><text class="prow-name">{{item.name}}</text><text class="prow-imps">{{item.impsText}}</text></view>
+            <view class="chevron"></view>
+          </button>
+          <view wx:if="{{index < peopleRows.length - 1}}" class="psep"></view>
+        </block>
+      </view>
+
+      <button class="primary save-btn" hover-class="pill-pressed" disabled="{{saving || deleting}}" bindtap="save">{{saving ? '保存中…' : '保存修改'}}</button>
+      <button disabled="{{saving || deleting}}" class="delete-link" hover-class="pill-pressed" bindtap="remove">删除这条事件</button>
+    </view>
+  </block>
+</view>
+
+<view wx:if="{{pickerOpen}}" class="picker-overlay" catchtap="closePersonPicker">
+  <view class="person-picker" catchtap="noop">
+    <view class="sheet-grabber"></view>
+    <view class="picker-head"><view><view class="picker-title">关联人物</view><view class="picker-count">已选 {{people.length}}/10</view></view><button hover-class="button-pressed" class="picker-close" bindtap="closePersonPicker" aria-label="关闭人物选择"><view class="picker-close-icon">×</view></button></view>
+    <view class="picker-hint">至少保留 1 人。取消关联后，这个人在本事件里的印象会一并移除。</view>
+    <input cursor-spacing="24" disabled="{{saving || deleting}}" class="picker-search" value="{{personQuery}}" placeholder="搜索人物" focus="{{pickerOpen}}" confirm-type="search" bindinput="searchPerson" placeholder-class="text-entry-placeholder" />
+    <scroll-view class="picker-list" scroll-y>
+      <button hover-class="button-pressed" disabled="{{saving || deleting}}" wx:for="{{pickerPeople}}" wx:key="id" class="picker-option {{item.linked ? 'linked' : ''}}" data-id="{{item.id}}" bindtap="togglePersonLink" aria-label="{{item.name}}">
+        <view class="picker-person"><image wx:if="{{item.avatarUrl}}" class="picker-avatar picker-avatar-image" src="{{item.avatarUrl}}" mode="aspectFill" /><view wx:else class="picker-avatar">{{item.avatar || '人'}}</view><text class="picker-person-name">{{item.name}}</text></view>
+        <view class="picker-status"><text>{{item.linked ? '已关联' : '关联'}}</text><view class="picker-check {{item.linked ? 'selected' : ''}}">{{item.linked ? '✓' : ''}}</view></view>
+      </button>
+      <view wx:if="{{!pickerPeople.length}}" class="picker-empty">没有找到人物</view>
+    </scroll-view>
+    <button hover-class="button-pressed" class="picker-done" bindtap="closePersonPicker">完成</button>
+  </view>
+</view>
+
+<view wx:if="{{tagPickerOpen}}" class="picker-overlay" catchtap="closeTagPicker">
+  <view class="person-picker tag-picker" catchtap="noop">
+    <view class="sheet-grabber"></view>
+    <view class="picker-head"><view class="picker-head-row"><view class="picker-title">对「{{activePersonName}}」的印象</view><text wx:if="{{tagPickerSelectedCount}}" class="tag-selected-badge">已选 {{tagPickerSelectedCount}}</text></view><button hover-class="button-pressed" class="picker-close" bindtap="closeTagPicker" aria-label="关闭印象选择"><view class="picker-close-icon">×</view></button></view>
+    <input wx:if="{{tagSearchVisible}}" cursor-spacing="24" disabled="{{saving || deleting}}" class="picker-search" value="{{tagQuery}}" placeholder="搜索印象" confirm-type="search" bindinput="searchTag" placeholder-class="text-entry-placeholder" />
+    <scroll-view class="picker-list" scroll-y>
+      <view class="tag-chip-grid">
+        <button disabled="{{saving || deleting}}" wx:for="{{tagPickerOptions}}" wx:key="name" class="tag-chip {{item.selected ? 'on' : ''}}" hover-class="pill-pressed" data-tag="{{item.name}}" bindtap="togglePickerTag">{{item.name}}</button>
+        <button wx:if="{{!tagAddOpen}}" disabled="{{saving || deleting}}" class="tag-chip tag-add-chip" hover-class="pill-pressed" bindtap="toggleTagAdd">＋ 新印象</button>
+      </view>
+      <view wx:if="{{!tagPickerOptions.length}}" class="picker-empty">没有找到印象</view>
+    </scroll-view>
+    <view wx:if="{{tagAddOpen}}" class="picker-add">
+      <input maxlength="8" aria-label="新印象词" bindblur="blurInput" focus="{{focusField === 'customTag'}}" cursor-spacing="24" disabled="{{saving || deleting}}" placeholder="没有合适的？添加新印象词" value="{{customTag}}" confirm-type="done" bindinput="changeCustom" bindconfirm="addCustom" placeholder-class="text-entry-placeholder" />
+      <button disabled="{{saving || deleting}}" hover-class="pill-pressed" bindtap="addCustom">添加</button>
+    </view>
+    <button hover-class="button-pressed" class="picker-done" bindtap="closeTagPicker">完成</button>
+  </view>
+</view>
+
+<view wx:if="{{moodPickerOpen}}" class="picker-overlay" catchtap="closeMoodPicker" catchtouchmove="noop">
+  <view class="person-picker" catchtap="noop">
+    <view class="sheet-grabber"></view>
+    <view class="picker-head"><view class="picker-title">当时的心情</view><button hover-class="button-pressed" class="picker-close" bindtap="closeMoodPicker" aria-label="关闭心情选择"><view class="picker-close-icon">×</view></button></view>
+    <view class="picker-hint">选一个贴近当时的感受，也可以不选。</view>
+    <scroll-view class="picker-list" scroll-y>
+      <view class="mood-options"><button hover-class="button-pressed" wx:for="{{moodList}}" wx:key="name" class="mood-option {{mood === item.name ? 'selected' : ''}}" data-name="{{item.name}}" bindtap="chooseMood" aria-label="{{item.name}}，{{mood === item.name ? '已选' : '未选'}}"><view class="mood-dot" style="background:{{item.color}}"></view><text>{{item.name}}</text><text wx:if="{{mood === item.name}}" class="mood-check">✓</text></button></view>
+    </scroll-view>
+    <view class="mood-picker-actions"><button hover-class="button-pressed" bindtap="chooseMood" data-name="">不选心情</button><button hover-class="button-pressed" bindtap="openMoodManager">管理心情<view class="chevron"></view></button></view>
+  </view>
+</view>
+
+<mood-manager show="{{moodSheetOpen}}" sync-state="{{moodSyncState}}" bind:retry="retryMoodSync" moods="{{moodList}}" bind:close="closeMoodManager" bind:change="onMoodsChange" />

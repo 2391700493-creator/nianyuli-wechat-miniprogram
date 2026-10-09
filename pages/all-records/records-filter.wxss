@@ -1,0 +1,47 @@
+.records-tools { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16rpx; padding-bottom: 24rpx; border-bottom: 1rpx solid #dedbd6; }
+.date-trigger, .search-trigger { display: flex; align-items: center; justify-content: center; gap: 16rpx; min-height: 88rpx; padding: 0 22rpx; border-radius: 18rpx; font-size: 27rpx; }
+.date-trigger { background: #fff; font-weight: 600; }
+.date-trigger.is-active { background: #1d1d1f; color: #fff; }
+.search-trigger { color: #64615c; font-size: 25rpx; }
+.search-trigger.is-active { background: #e7e4df; color: #1d1d1f; }
+.chevron { width: 10rpx; height: 10rpx; border-right: 2rpx solid currentColor; border-bottom: 2rpx solid currentColor; transform: rotate(45deg); margin: -6rpx 4rpx 0; }
+.search-icon { position: relative; width: 22rpx; height: 22rpx; border: 2rpx solid currentColor; border-radius: 50%; }
+.search-icon::after { content: ''; position: absolute; width: 9rpx; height: 2rpx; background: currentColor; bottom: -3rpx; right: -6rpx; transform: rotate(45deg); }
+.filter-panel { flex: none; margin-top: 20rpx; padding: 18rpx; border-radius: 18rpx; background: #fff; }
+.panel-search { position: relative; display: flex; align-items: center; background: #f2f0ed; border-radius: 12rpx; }
+.panel-input { flex: 1; min-width: 0; height: 88rpx; padding: 0 80rpx 0 20rpx; font-size: 25rpx; }
+.search-clear { position: absolute; right: 0; width: 80rpx; height: 88rpx; line-height: 88rpx; font-size: 36rpx; color: #64615c; }
+.people-scroll { max-height: 180rpx; margin-top: 16rpx; }
+.people-chips { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.p-chip { min-height: 72rpx; line-height: 72rpx; padding: 0 22rpx; border-radius: 99rpx; background: #f2f0ed; font-size: 24rpx; }
+.p-chip-on { background: #1d1d1f; color: #fff; }
+.fchips { flex: none; width: 100%; white-space: nowrap; margin-top: 16rpx; }
+.fchip { display: inline-flex; align-items: center; max-width: 100%; min-height: 72rpx; padding: 0 18rpx; margin-right: 12rpx; border-radius: 12rpx; background: #fff; color: #55514c; font-size: 24rpx; white-space: normal; overflow-wrap: anywhere; }
+.fchip-x { margin-left: 16rpx; }
+.calendar-overlay { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000; }
+.calendar-mask { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(29, 27, 24, .32); }
+.calendar-sheet { display: flex; flex-direction: column; max-height: 90vh; position: absolute; left: 0; right: 0; bottom: 0; border-radius: 32rpx 32rpx 0 0; padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom)); background: #f8f7f4; }
+.sheet-head { flex: none; display: flex; justify-content: space-between; align-items: center; }
+.sheet-title { font-size: 32rpx; font-weight: 600; }
+.sheet-close { width: 88rpx; height: 88rpx; line-height: 88rpx; font-size: 40rpx; color: #706b64; }
+.calendar-head { flex: none; display: flex; align-items: center; justify-content: space-between; margin: 4rpx 0 12rpx; }
+.month-nav { width: 88rpx; height: 88rpx; line-height: 80rpx; font-size: 46rpx; }
+.month-title { display: flex; align-items: center; gap: 12rpx; min-height: 88rpx; font-size: 30rpx; font-weight: 600; }
+.calendar-body { flex: 0 1 auto; min-height: 0; height: 556rpx; max-height: calc(90vh - 356rpx - env(safe-area-inset-bottom)); }
+.calendar-body-six { height: 640rpx; }
+.calendar-grid { display: flex; flex-wrap: wrap; }
+.weekday, .day-cell { width: 14.285714%; text-align: center; }
+.weekday { padding: 12rpx 0; font-size: 23rpx; color: #78726b; }
+.day-cell { height: 84rpx; display: flex; justify-content: center; }
+.calendar-day { width: 80rpx; height: 80rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7rpx; border-radius: 50%; font-size: 28rpx; }
+.day-today { box-shadow: inset 0 0 0 2rpx #b6afa5; font-weight: 600; }
+.day-selected { background: #1d1d1f; color: #fff; box-shadow: none; }
+.day-dot { width: 7rpx; height: 7rpx; border-radius: 50%; background: transparent; }
+.has-records { background: #82796d; }
+.day-selected .has-records { background: #fff; }
+.calendar-hint { display: flex; align-items: center; justify-content: center; gap: 10rpx; margin: 20rpx 0 28rpx; color: #78726b; font-size: 22rpx; }
+.hint-dot { width: 7rpx; height: 7rpx; border-radius: 50%; background: #82796d; }
+.calendar-actions { flex: none; display: flex; gap: 20rpx; padding-top: 20rpx; border-top: 1rpx solid #e2ded8; background: #f8f7f4; }
+.calendar-actions button { flex: 1; min-height: 88rpx; line-height: 88rpx; border-radius: 18rpx; font-size: 28rpx; }
+.all-time { background: #eae6e0; }
+.today-button { background: #1d1d1f; color: #fff; }

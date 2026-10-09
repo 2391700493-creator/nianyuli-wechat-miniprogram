@@ -1,0 +1,95 @@
+<view class="page record-page {{keyboardHeight ? 'keyboard-open' : ''}}" style="height: calc(100vh - {{keyboardHeight}}px);">
+  <view class="record-heading"><view class="record-date">{{dateLabel}}</view></view>
+  <view class="writing-area">
+    <textarea disable-default-padding="{{true}}" aria-label="事件内容" class="event-input" value="{{text}}" placeholder="写下发生的事…" placeholder-class="input-placeholder text-entry-placeholder" maxlength="1000" disabled="{{saving}}" focus="{{focusField === 'text'}}" adjust-position="{{false}}" cursor-spacing="16" show-confirm-bar="{{true}}" bindfocus="onTextFocus" bindblur="blurInput" bindkeyboardheightchange="onKeyboardHeightChange" bindinput="onTextInput" />
+    <text wx:if="{{text.length > 900}}" class="text-count">{{text.length}}/1000</text>
+  </view>
+  <view class="record-footer">
+    <view wx:if="{{peopleLoading}}" class="load-note">人物加载中…</view>
+    <view wx:elif="{{loadFailed}}" class="load-note">人物加载失败<button hover-class="button-pressed" bindtap="retryLoad">重试</button></view>
+    <view class="metadata-row people-metadata">
+      <view class="metadata-label">关联人物<text wx:if="{{mentions.length > 1}}" class="people-count">{{mentions.length}}/10</text></view>
+      <scroll-view wx:if="{{mentions.length}}" class="person-row" scroll-x enhanced show-scrollbar="{{false}}">
+        <button hover-class="button-pressed" disabled="{{saving}}" wx:for="{{mentions}}" wx:key="key" class="person-chip" data-key="{{item.key}}" bindtap="removeMention" aria-label="移除{{item.name}}"><text class="person-chip-name">{{item.name}}</text><text class="person-chip-x">×</text></button>
+      </scroll-view>
+      <button hover-class="button-pressed" disabled="{{saving || peopleLoading || loadFailed}}" class="person-add person-add-icon" bindtap="openPersonPicker" aria-label="添加关联人物"><text class="person-add-plus">＋</text></button>
+    </view>
+    <button hover-class="button-pressed" class="metadata-row mood-summary" disabled="{{saving || peopleLoading || loadFailed}}" bindtap="openMoodPicker" aria-label="选择当时情绪，{{mood || '未选择'}}">
+      <view class="metadata-label">当时情绪</view>
+      <view class="mood-value"><view wx:if="{{mood}}" class="selected-mood-dot" style="background: {{selectedMoodColor}};"></view><text class="{{mood ? '' : 'value-placeholder'}}">{{mood || '选择心情'}}</text><text class="row-chevron">›</text></view>
+    </button>
+    <button hover-class="button-pressed" class="metadata-row impression-summary" disabled="{{saving || peopleLoading || loadFailed}}" bindtap="openTagPicker" aria-label="选择人物印象">
+      <view class="metadata-label">人物印象</view><view class="impression-value"><text class="{{tagSummary ? '' : 'value-placeholder'}}">{{tagSummary || '选择印象'}}</text><text class="row-chevron">›</text></view>
+    </button>
+    <view wx:if="{{moodSyncState === 'syncing' || moodSyncState === 'failed'}}" class="mood-sync-status"><text>{{moodSyncState === 'syncing' ? '心情设置同步中…' : '心情设置未同步，改动已暂存'}}</text><button hover-class="button-pressed" wx:if="{{moodSyncState === 'failed'}}" bindtap="retryMoodSync">重试</button></view>
+    <button hover-class="button-pressed" class="save" disabled="{{saving || peopleLoading || loadFailed}}" bindtap="save">{{saving ? '保存中…' : '保存记录'}}</button>
+  </view>
+</view>
+<view wx:if="{{moodPickerOpen}}" class="mood-picker-overlay" catchtap="closeMoodPicker" catchtouchmove="noop">
+  <view class="mood-picker" catchtap="noop">
+    <view class="mood-picker-head"><view class="picker-title">当时情绪</view><button hover-class="button-pressed" class="picker-close" bindtap="closeMoodPicker" aria-label="关闭心情选择"><view class="picker-close-icon">×</view></button></view>
+    <view class="mood-picker-description">选一个贴近当时的感受，也可以不选。</view>
+    <scroll-view class="mood-options-scroll" scroll-y>
+      <view class="mood-options">
+        <button hover-class="button-pressed" wx:for="{{moodList}}" wx:key="name" class="mood-option {{mood === item.name ? 'selected' : ''}}" data-name="{{item.name}}" bindtap="chooseMood" aria-label="{{item.name}}，{{mood === item.name ? '已选' : '未选'}}"><view class="selected-mood-dot" style="background: {{item.color}};"></view><text>{{item.name}}</text><text wx:if="{{mood === item.name}}" class="mood-check">✓</text></button>
+      </view>
+    </scroll-view>
+    <view class="mood-picker-actions"><button hover-class="button-pressed" class="clear-mood" data-name="" bindtap="chooseMood">不选心情</button><button hover-class="button-pressed" class="manage-moods" bindtap="openMoodManager">管理心情<text class="row-chevron">›</text></button></view>
+  </view>
+</view>
+<mood-manager show="{{moodSheetOpen}}" sync-state="{{moodSyncState}}" bind:retry="retryMoodSync" moods="{{moodList}}" bind:close="closeMoodManager" bind:change="onMoodsChange" />
+<view wx:if="{{pickerOpen}}" class="picker-overlay" catchtap="closePersonPicker">
+  <view class="person-picker" catchtap="noop">
+    <view class="picker-head">
+      <view><view class="picker-title">{{personCreateOpen ? '新建人物' : '关联人物'}}</view><view wx:if="{{!personCreateOpen}}" class="picker-hint">点击方块选人，再点一次可移除</view></view>
+      <button hover-class="button-pressed" class="picker-close" disabled="{{personCreating}}" bindtap="closePersonPicker" aria-label="关闭人物选择"><view class="picker-close-icon">×</view></button>
+    </view>
+    <view wx:if="{{personCreateOpen}}">
+      <view class="person-create-hint">已写的内容会保留，创建后可选择关联。</view>
+      <input class="picker-search" aria-label="人物名字" maxlength="30" value="{{newPersonName}}" placeholder="输入人物名字" focus="{{focusField === 'newPersonName'}}" disabled="{{personCreating}}" cursor-spacing="24" confirm-type="done" bindinput="changePersonName" bindblur="blurInput" bindconfirm="saveNewPerson" placeholder-class="text-entry-placeholder" />
+      <view class="person-create-actions"><button hover-class="button-pressed" class="person-create-cancel" disabled="{{personCreating}}" bindtap="cancelPersonCreate">返回选择</button><button hover-class="button-pressed" class="person-create-save" disabled="{{personCreating}}" bindtap="saveNewPerson">{{personCreating ? '创建中…' : '创建人物'}}</button></view>
+    </view>
+    <block wx:else>
+      <input cursor-spacing="24" disabled="{{saving}}" class="picker-search" value="{{personQuery}}" placeholder="搜索人物" confirm-type="search" bindinput="searchPerson" placeholder-class="text-entry-placeholder" />
+      <scroll-view class="picker-scroll" scroll-y>
+        <view wx:if="{{!peopleLoading && !loadFailed}}" class="picker-grid">
+          <button hover-class="button-pressed" disabled="{{saving}}" wx:for="{{pickerPeople}}" wx:key="id" class="person-tile {{item.linked ? 'linked' : ''}}" data-id="{{item.id}}" bindtap="pickPerson" aria-label="{{item.name}}">
+            <view wx:if="{{item.avatarUrl}}" class="person-tile-avatar"><image class="person-tile-photo" src="{{item.avatarUrl}}" mode="aspectFill" /></view><view wx:else class="person-tile-avatar">{{item.initial}}</view><text class="person-tile-name">{{item.name}}</text>
+          </button>
+        </view>
+        <view wx:if="{{peopleLoading}}" class="picker-empty">人物加载中…</view>
+        <view wx:elif="{{loadFailed}}" class="picker-empty">人物加载失败<button hover-class="button-pressed" class="retry" bindtap="retryLoad">重试</button></view>
+        <view wx:elif="{{!pickerPeople.length && people.length}}" class="picker-empty">没有找到人物</view>
+        <button hover-class="button-pressed" wx:if="{{!peopleLoading && !loadFailed}}" class="person-create-link" bindtap="openPersonCreate">{{people.length ? '＋ 新建人物' : '还没有关联人物，新建一个'}}</button>
+      </scroll-view>
+      <view class="picker-footer"><text class="picker-count">已选 {{mentions.length}}/10</text><button hover-class="button-pressed" class="picker-done" bindtap="closePersonPicker">完成</button></view>
+    </block>
+  </view>
+</view>
+
+<view wx:if="{{tagPickerOpen}}" class="mood-picker-overlay" catchtap="closeTagPicker" catchtouchmove="noop">
+  <view class="mood-picker" catchtap="noop">
+    <view class="mood-picker-head"><view class="picker-title">人物印象</view><button hover-class="button-pressed" class="picker-close" bindtap="closeTagPicker" aria-label="关闭印象选择"><view class="picker-close-icon">×</view></button></view>
+    <view class="mood-picker-description">这件事中，你对{{tagPersonName}}的印象。可多选，也可以不选。</view>
+    <scroll-view wx:if="{{mentions.length > 1}}" class="impression-persons" scroll-x><button hover-class="button-pressed" wx:for="{{mentions}}" wx:key="id" class="impression-person {{tagPersonId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectTagPerson">{{item.name}}</button></scroll-view>
+    <scroll-view class="mood-options-scroll" scroll-y>
+      <view class="mood-options"><button hover-class="button-pressed" wx:for="{{tagOptions}}" wx:key="name" class="mood-option {{item.selected ? 'selected' : ''}}" data-name="{{item.name}}" bindtap="toggleImpression" aria-label="{{item.name}}，{{item.selected ? '已选' : '未选'}}"><text>{{item.name}}</text><text wx:if="{{item.selected}}" class="mood-check">✓</text></button></view>
+      <view wx:if="{{!tagOptions.length}}" class="picker-empty">还没有印象词，点击下方“管理印象”添加。</view>
+    </scroll-view>
+    <view class="mood-picker-actions"><button hover-class="button-pressed" class="clear-mood" bindtap="clearImpressions">清空{{mentions.length > 1 ? '此人' : ''}}印象</button><button hover-class="button-pressed" class="manage-moods" bindtap="openTagManager">管理印象<text class="row-chevron">›</text></button></view>
+    <button hover-class="button-pressed" class="picker-done impression-done" bindtap="closeTagPicker">完成选择</button>
+  </view>
+</view>
+<view wx:if="{{tagManagerOpen}}" class="mood-picker-overlay" catchtap="closeTagManager" catchtouchmove="noop">
+  <view class="mood-picker" catchtap="noop">
+    <view class="mood-picker-head"><view class="picker-title">管理印象</view><button hover-class="button-pressed" class="picker-close" disabled="{{tagBusy}}" bindtap="closeTagManager" aria-label="返回印象选择"><view class="picker-close-icon">×</view></button></view>
+    <view class="mood-picker-description">词库修改即时保存。停用或删除词语后，已选和已有记录中的印象保留；改名会同步更新。</view>
+    <view class="tag-name-row"><input class="picker-search" aria-label="印象词" maxlength="8" value="{{tagName}}" placeholder="{{tagRenaming ? '输入新名字' : '添加印象词'}}" focus="{{focusField === 'tagName'}}" disabled="{{tagBusy}}" cursor-spacing="24" confirm-type="done" bindinput="changeTagName" bindblur="blurInput" bindconfirm="saveTagName" placeholder-class="text-entry-placeholder" /><button hover-class="button-pressed" class="tag-name-save" disabled="{{tagBusy}}" bindtap="saveTagName">{{tagBusy ? '保存中' : (tagRenaming ? '保存' : '添加')}}</button></view>
+    <button hover-class="button-pressed" wx:if="{{tagRenaming}}" class="clear-mood" disabled="{{tagBusy}}" bindtap="cancelTagRename">取消改名</button>
+    <scroll-view class="tag-manage-scroll" scroll-y>
+      <view wx:for="{{tagList}}" wx:key="name" class="tag-manage-row"><text class="tag-manage-name {{item.active ? '' : 'inactive'}}">{{item.name}}</text><button hover-class="button-pressed" disabled="{{tagBusy}}" data-name="{{item.name}}" bindtap="startTagRename">改名</button><button hover-class="button-pressed" disabled="{{tagBusy}}" data-name="{{item.name}}" bindtap="toggleManagedTag">{{item.active ? '停用' : '启用'}}</button><button hover-class="button-pressed" class="tag-delete" disabled="{{tagBusy}}" data-name="{{item.name}}" bindtap="deleteManagedTag">删除</button></view>
+      <view wx:if="{{!tagList.length}}" class="picker-empty">还没有印象词，在上方添加。</view>
+    </scroll-view>
+    <button hover-class="button-pressed" class="picker-done impression-done" disabled="{{tagBusy}}" bindtap="closeTagManager">返回选择印象</button>
+  </view>
+</view>

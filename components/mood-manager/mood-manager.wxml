@@ -1,0 +1,69 @@
+<view wx:if="{{show}}" class="mm-overlay" catchtap="close">
+  <view class="mm-sheet" catchtap="noop">
+    <view class="mm-grabber"></view>
+    <view class="mm-head">
+      <view>
+        <view class="mm-title">管理心情</view>
+        <view class="mm-count">{{manage.length}} 个心情 · 修改即时生效</view>
+      </view>
+      <button hover-class="button-pressed" class="mm-close" bindtap="close" aria-label="关闭心情管理"><view class="mm-close-icon">×</view></button>
+    </view>
+    <view class="mm-hint">点心情左侧的色框换颜色，减号删除心情。删除只影响选项，已记录的事件不受影响。</view>
+    <scroll-view class="mm-list" scroll-y>
+      <block wx:for="{{manage}}" wx:key="name">
+        <view class="mm-row">
+          <button class="mm-minus" hover-class="mm-pressed" data-idx="{{index}}" bindtap="onDelete" aria-label="删除{{item.name}}">−</button>
+          <button hover-class="button-pressed" class="mm-dot" style="background:{{item.color}}" data-idx="{{index}}" bindtap="togglePalette" aria-label="修改{{item.name}}的颜色"></button>
+          <text class="mm-name">{{item.name}}</text>
+        </view>
+        <view wx:if="{{paletteIndex === index}}" class="mm-palette">
+          <view class="mm-swatches">
+            <button hover-class="button-pressed" wx:for="{{palette}}" wx:for-item="color" wx:key="*this" class="mm-swatch {{color === item.color ? 'on' : ''}}" style="background:{{color}}" data-color="{{color}}" bindtap="pickColor" aria-label="选择颜色{{color}}"></button>
+          </view>
+          <view class="mm-sliders">
+            <view class="mm-slider-row">
+              <text class="mm-slider-label">色相</text>
+              <slider class="mm-slider" data-kind="hue" min="0" max="360" value="{{hsv.h}}" block-size="20" block-color="{{bars.hueThumb}}" activeColor="#1d1d1f" bindchanging="onSlide" bindchange="onSlide" aria-label="色相" />
+            </view>
+            <view class="mm-slider-row">
+              <text class="mm-slider-label">深浅</text>
+              <slider class="mm-slider" data-kind="sat" min="0" max="100" value="{{hsv.s}}" block-size="20" block-color="{{bars.satThumb}}" activeColor="#1d1d1f" bindchanging="onSlide" bindchange="onSlide" aria-label="深浅" />
+            </view>
+            <view class="mm-slider-row">
+              <text class="mm-slider-label">明暗</text>
+              <slider class="mm-slider" data-kind="val" min="15" max="100" value="{{hsv.v}}" block-size="20" block-color="{{bars.valThumb}}" activeColor="#1d1d1f" bindchanging="onSlide" bindchange="onSlide" aria-label="明暗" />
+            </view>
+          </view>
+          <view class="mm-preview"><view class="mm-preview-dot" style="background:{{bars.preview}}"></view><text class="mm-preview-hex">{{bars.preview}}</text></view>
+        </view>
+      </block>
+    </scroll-view>
+    <view class="mm-add">
+      <button hover-class="button-pressed" class="mm-dot" style="background:{{newMoodColor}}" bindtap="togglePalette" data-idx="new" aria-label="修改新心情的颜色"></button>
+      <input class="mm-add-input" focus="{{nameFocused}}" bindblur="blurName" cursor-spacing="24" aria-label="新心情名称" value="{{newMoodName}}" placeholder="新心情（最多 4 字）" confirm-type="done" bindinput="changeNewMood" bindconfirm="addMood" placeholder-class="text-entry-placeholder" />
+      <button class="mm-add-btn" hover-class="mm-pressed" bindtap="addMood">添加</button>
+    </view>
+    <view wx:if="{{paletteIndex === 'new'}}" class="mm-palette mm-palette-new">
+      <view class="mm-swatches">
+        <button hover-class="button-pressed" wx:for="{{palette}}" wx:for-item="color" wx:key="*this" class="mm-swatch {{color === newMoodColor ? 'on' : ''}}" style="background:{{color}}" data-color="{{color}}" bindtap="pickColor" aria-label="选择颜色{{color}}"></button>
+      </view>
+      <view class="mm-sliders">
+        <view class="mm-slider-row">
+          <text class="mm-slider-label">色相</text>
+          <slider class="mm-slider" data-kind="hue" min="0" max="360" value="{{hsv.h}}" block-size="20" block-color="{{bars.hueThumb}}" activeColor="#1d1d1f" bindchanging="onSlide" bindchange="onSlide" aria-label="色相" />
+        </view>
+        <view class="mm-slider-row">
+          <text class="mm-slider-label">深浅</text>
+          <slider class="mm-slider" data-kind="sat" min="0" max="100" value="{{hsv.s}}" block-size="20" block-color="{{bars.satThumb}}" activeColor="#1d1d1f" bindchanging="onSlide" bindchange="onSlide" aria-label="深浅" />
+        </view>
+        <view class="mm-slider-row">
+          <text class="mm-slider-label">明暗</text>
+          <slider class="mm-slider" data-kind="val" min="15" max="100" value="{{hsv.v}}" block-size="20" block-color="{{bars.valThumb}}" activeColor="#1d1d1f" bindchanging="onSlide" bindchange="onSlide" aria-label="明暗" />
+        </view>
+      </view>
+      <view class="mm-preview"><view class="mm-preview-dot" style="background:{{bars.preview}}"></view><text class="mm-preview-hex">{{bars.preview}}</text></view>
+    </view>
+    <view wx:if="{{syncState}}" class="mm-sync"><text>{{syncState === 'syncing' ? '同步中…' : syncState === 'failed' ? '未同步，改动已暂存' : '已同步'}}</text><button hover-class="button-pressed" wx:if="{{syncState === 'failed'}}" bindtap="retry">重试</button></view>
+    <button hover-class="button-pressed" class="mm-done" bindtap="close">完成</button>
+  </view>
+</view>

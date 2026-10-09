@@ -1,0 +1,40 @@
+<view class="records-tools">
+  <button hover-class="button-pressed" class="date-trigger {{startDate ? 'is-active' : ''}}" bindtap="toggleCalendar" aria-expanded="{{showCalendar}}" aria-label="按日期查看，当前{{dateLabel}}"><text>{{dateLabel}}</text><view class="chevron"></view></button>
+  <button hover-class="button-pressed" class="search-trigger {{showPanel ? 'is-active' : ''}}" bindtap="togglePanel" aria-expanded="{{showPanel}}"><view class="search-icon"></view><text>搜索与筛选</text></button>
+</view>
+<view wx:if="{{showPanel}}" class="filter-panel">
+  <view class="panel-search">
+    <input class="panel-input" placeholder="搜索记录、人物或印象" aria-label="搜索记录、人物或印象" value="{{keyword}}" confirm-type="search" bindinput="search" placeholder-class="text-entry-placeholder" />
+    <button hover-class="button-pressed" wx:if="{{keyword}}" class="search-clear" bindtap="clearSearch" aria-label="清除搜索">×</button>
+  </view>
+  <scroll-view wx:if="{{people.length}}" scroll-y class="people-scroll">
+    <view class="people-chips">
+      <button hover-class="button-pressed" class="p-chip {{!selectedPeople.length ? 'p-chip-on' : ''}}" bindtap="clearPeople">全部人物</button>
+      <button hover-class="button-pressed" wx:for="{{people}}" wx:key="id" class="p-chip {{item.on ? 'p-chip-on' : ''}}" data-id="{{item.id}}" bindtap="togglePerson" aria-label="{{item.name + (item.on ? '，已选择' : '，未选择')}}">{{item.name}}</button>
+    </view>
+  </scroll-view>
+</view>
+<scroll-view wx:if="{{activeChips.length}}" class="fchips" scroll-x>
+  <button hover-class="button-pressed" wx:for="{{activeChips}}" wx:key="label" class="fchip" data-index="{{index}}" bindtap="removeChip" aria-label="移除筛选{{item.label}}">{{item.label}}<text class="fchip-x">×</text></button>
+</scroll-view>
+<view wx:if="{{showCalendar}}" class="calendar-overlay" catchtouchmove="stopTouch">
+  <view class="calendar-mask" bindtap="closeCalendar"></view>
+  <view class="calendar-sheet">
+    <view class="sheet-head"><text class="sheet-title">按日期查看</text><button hover-class="button-pressed" class="sheet-close" bindtap="closeCalendar" aria-label="关闭日历">×</button></view>
+    <view class="calendar-head">
+      <button hover-class="button-pressed" class="month-nav" bindtap="prevMonth" aria-label="上个月">‹</button>
+      <picker mode="date" fields="month" value="{{anchor}}" bindchange="jumpMonth"><view class="month-title">{{monthTitle}}<view class="chevron"></view></view></picker>
+      <button hover-class="button-pressed" class="month-nav" bindtap="nextMonth" aria-label="下个月">›</button>
+    </view>
+    <scroll-view class="calendar-body {{days.length > 35 ? 'calendar-body-six' : ''}}" scroll-y>
+    <view class="calendar-grid">
+      <text wx:for="{{weekdays}}" wx:key="*this" class="weekday">{{item}}</text>
+      <view wx:for="{{days}}" wx:key="key" class="day-cell">
+        <button hover-class="button-pressed" wx:if="{{item.iso}}" class="calendar-day {{item.selected ? 'day-selected' : ''}} {{item.isToday ? 'day-today' : ''}}" data-iso="{{item.iso}}" bindtap="tapDay" aria-label="{{item.iso + (item.isToday ? '，今天' : '') + (item.has ? '，有符合条件的记录' : '，无符合条件的记录') + (item.selected ? '，已选中' : '')}}"><text>{{item.num}}</text><view class="day-dot {{item.has ? 'has-records' : ''}}"></view></button>
+      </view>
+    </view>
+    <view class="calendar-hint"><view class="hint-dot"></view><text>{{keyword || selectedPeople.length ? '圆点表示有符合筛选条件的记录' : '圆点表示当天有记录'}} · 点击日期查看</text></view>
+    </scroll-view>
+    <view class="calendar-actions"><button hover-class="button-pressed" class="all-time" bindtap="clearDates">全部时间</button><button hover-class="button-pressed" class="today-button" bindtap="selectToday">今天</button></view>
+  </view>
+</view>

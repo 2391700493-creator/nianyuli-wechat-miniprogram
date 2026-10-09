@@ -1,0 +1,47 @@
+@import '../../styles/matte.wxss';
+page { height: 100%; overflow: hidden; background: #fdfcf9; }
+.person-page { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #111214; }
+.page-status { color: #c1bdb5; }
+.profile-hero { flex: none; max-height: 38vh; overflow-y: auto; padding: 32rpx 44rpx 36rpx; color: #fdfcf9; }
+.profile { display: flex; align-items: center; gap: 22rpx; }
+.avatar-upload { flex: none; width: 124rpx; height: 124rpx; border-radius: 50%; }
+.avatar-lg { display: flex; align-items: center; justify-content: center; width: 124rpx; height: 124rpx; border-radius: 50%; background: #e7e0d3; color: #22252c; font-size: 46rpx; font-weight: 500; }
+.profile-copy { flex: 1; min-width: 0; }
+.profile-name { font-size: 46rpx; line-height: 1.3; font-weight: 600; overflow-wrap: anywhere; }
+.profile-note { margin-top: 12rpx; font-size: 25rpx; line-height: 1.6; color: #bdbab5; overflow-wrap: anywhere; }
+.profile-edit { display: flex; align-items: center; justify-content: center; flex: none; min-height: 88rpx; padding: 0 8rpx 0 20rpx; color: #c9c6c0; font-size: 25rpx; line-height: 1.4; white-space: nowrap; }
+.profile-edit:active { color: #fff; }
+.profile-basics { display: flex; flex-wrap: wrap; gap: 12rpx 24rpx; margin-top: 24rpx; color: #bdbab5; font-size: 22rpx; line-height: 1.6; }
+.profile-stats { display: flex; align-items: center; gap: 40rpx; margin-top: 44rpx; }
+.stat, .last-stat { display: flex; align-items: center; gap: 16rpx; color: #bdbab5; font-size: 24rpx; }
+.stat-number { color: #fdfcf9; font-size: 56rpx; font-weight: 400; line-height: 1.2; }
+.stat-divider { width: 2rpx; height: 52rpx; background: #5b5b5e; }
+.stat-caption { margin-top: 6rpx; font-size: 21rpx; }
+.person-sheet { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; padding: 32rpx 44rpx 0; background: #fdfcf9; border-radius: 56rpx 56rpx 0 0; }
+.person-sheet .section-head { flex: none; margin-bottom: 28rpx; }
+.person-sheet .section-title { font-size: 36rpx; }
+.record-count { color: #918b82; font-size: 25rpx; }
+.tag-scroll { flex: none; width: 100%; margin-bottom: 24rpx; }
+.records-scroll { flex: 1; height: 0; min-height: 0; width: 100%; }
+.tag-list { display: flex; gap: 28rpx; border-bottom: 1rpx solid #e8e4dc; }
+.tag { display: flex; align-items: center; justify-content: center; flex: none; min-height: 88rpx; padding: 12rpx 8rpx; border-bottom: 4rpx solid transparent; background: transparent; color: #77726b; font-size: 26rpx; line-height: 1.4; }
+.tag.selected { border-bottom-color: #111214; color: #111214; font-weight: 600; }
+.tag:active { color: #111214; background: #f0ede7; }
+.person-timeline { position: relative; margin-left: 10rpx; padding-left: 38rpx; }
+.person-timeline::before { content: ''; position: absolute; left: 0; top: 24rpx; bottom: 20rpx; width: 2rpx; background: #dedad3; }
+.record-row { position: relative; padding-bottom: 38rpx; }
+.record-row:last-child { padding-bottom: 8rpx; }
+.record-dot { position: absolute; top: 20rpx; left: -46rpx; width: 18rpx; height: 18rpx; border: 2rpx solid #bab6af; border-radius: 50%; background: #fdfcf9; box-shadow: 0 0 0 6rpx #fdfcf9; }
+.person-sheet .event { padding: 10rpx 0 18rpx; border-radius: 10rpx; }
+.person-sheet .event-top { justify-content: flex-start; flex-wrap: wrap; gap: 22rpx; margin-bottom: 22rpx; }
+.person-sheet .event-date { color: #333436; font-size: 28rpx; }
+.person-sheet .event-text { line-height: 1.65; overflow-wrap: anywhere; }
+.event-tags-line { display: block; margin-top: 16rpx; font-size: 24rpx; line-height: 1.6; color: #918b82; overflow-wrap: anywhere; }
+.event-pressed { background: #f0ede7; }
+.view-all { margin: 24rpx auto; min-height: 80rpx; color: #77726b; font-size: 25rpx; }
+.person-footer { flex: none; padding-top: 24rpx; padding-bottom: calc(12rpx + env(safe-area-inset-bottom)); background: #fdfcf9; }
+.record-button { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 96rpx; padding: 20rpx 24rpx; border-radius: 48rpx; color: #fdfcf9; font-size: 30rpx; font-weight: 500; line-height: 1.4; }
+.secondary-actions { display: flex; justify-content: center; margin-top: 24rpx; }
+.delete-person { display: flex; align-items: center; justify-content: center; min-height: 88rpx; padding: 12rpx 32rpx; color: #a34e45; font-size: 24rpx; line-height: 1.4; }
+.delete-person:active { color: #b42318; }
+@media (max-width: 350px) { .profile { flex-wrap: wrap; } .profile-edit { margin-left: auto; } .profile-stats { gap: 24rpx; } .stat-number { font-size: 44rpx; } }

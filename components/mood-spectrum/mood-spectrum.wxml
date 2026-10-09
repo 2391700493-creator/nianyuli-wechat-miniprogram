@@ -1,0 +1,16 @@
+<view class="spectrum">
+  <view class="spectrum-readout">
+    <view class="spectrum-dot" style="background:{{moodColor}}"></view>
+    <text class="spectrum-name {{value ? '' : 'empty'}}">{{value || '点选当时的心情'}}</text>
+  </view>
+  <view class="spectrum-track {{dragging ? 'dragging' : ''}}" aria-role="slider" aria-label="当时的心情" bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd" bindtouchcancel="onTouchEnd">
+    <view class="spectrum-rail" style="background:{{spectrumGradient}}">
+      <view wx:for="{{spectrumStops}}" wx:key="*this" class="spectrum-stop" style="left:{{item}}%"></view>
+    </view>
+    <view class="spectrum-thumb {{moodIndex < 0 ? 'empty' : ''}}" style="left:{{spectrumThumbLeft}}%">
+      <view class="spectrum-thumb-inner" style="background:{{moodColor}}"></view>
+    </view>
+  </view>
+  <view class="spectrum-options"><button hover-class="button-pressed" wx:for="{{moods}}" wx:key="name" class="spectrum-option {{value === item.name ? 'selected' : ''}}" data-name="{{item.name}}" disabled="{{disabled}}" aria-label="{{item.name}}{{value === item.name ? '，已选中，再次点击取消' : ''}}" bindtap="chooseMood">{{item.name}}</button></view>
+  <view class="spectrum-hint">拖动或点选心情 · 再点一次当前心情可取消</view>
+</view>

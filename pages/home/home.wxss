@@ -1,0 +1,46 @@
+@import '../../styles/matte.wxss';
+page { background: #111214; }
+.home-page { min-height: 100vh; background: #111214; }
+.home-hero { position: relative; overflow: hidden; padding: 58rpx 48rpx 70rpx; color: #fff; }
+.hero-eyebrow, .home-title, .hero-bottom { position: relative; z-index: 1; }
+.hero-eyebrow { margin-bottom: 22rpx; color: #b2ada5; font-size: 22rpx; letter-spacing: 2rpx; }
+.home-title { font-size: 56rpx; line-height: 1.45; font-weight: 500; letter-spacing: 1rpx; }
+.hero-bottom { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; margin-top: 56rpx; }
+.hero-stats { display: flex; align-items: center; gap: 26rpx; min-width: 0; }
+.stat { display: flex; align-items: baseline; gap: 10rpx; color: #b1aca4; font-size: 20rpx; white-space: nowrap; }
+.stat-number { font-size: 48rpx; line-height: 1.1; color: #fff; font-weight: 400; }
+.stat-divider { width: 1rpx; height: 42rpx; flex: none; background: rgba(255,255,255,.1); }
+.quick { flex: none; display: flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 176rpx; min-height: 88rpx; padding: 0 28rpx; border-radius: 26rpx; background: #fdfcf9; color: #22252c; font-size: 26rpx; font-weight: 500; letter-spacing: .5rpx; white-space: nowrap; }
+.quick-pressed { background: #e7e0d3; }
+.home-sheet { min-height: 55vh; padding: 40rpx 44rpx calc(144rpx + env(safe-area-inset-bottom)); border-radius: 56rpx 56rpx 0 0; background: #fdfcf9; }
+.home-sheet .section-head { min-height: 64rpx; margin-bottom: 22rpx; gap: 12rpx; }
+.home-sheet .section-title { font-size: 34rpx; font-weight: 600; color: #1d1d1f; }
+.home-sheet .section-link { min-height: 64rpx; display: flex; align-items: center; font-size: 24rpx; font-weight: 400; color: #77726b; white-space: nowrap; }
+.people-scroll { width: 100%; }
+.people-track { display: flex; gap: 16rpx; align-items: flex-start; padding: 6rpx 0; }
+.person-card { flex: none; width: 148rpx; display: flex; align-items: center; flex-direction: column; border-radius: 18rpx; padding: 0 4rpx 6rpx; overflow: visible; }
+.person-pressed { background: #f0ece5; }
+.person-avatar-wrap { position: relative; width: 94rpx; height: 94rpx; margin-bottom: 16rpx; }
+.person-avatar { width: 94rpx; height: 94rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #e7e0d3; color: #55524b; font-size: 36rpx; font-weight: 500; }
+.person-mood-dot { position: absolute; top: 0; right: -2rpx; width: 20rpx; height: 20rpx; border: 4rpx solid #fdfcf9; border-radius: 50%; }
+.person-name { width: 100%; color: #42403d; font-size: 24rpx; font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; }
+.person-meta { width: 100%; margin-top: 8rpx; color: #918b82; font-size: 20rpx; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.person-add-plus { display: flex; align-items: center; justify-content: center; width: 94rpx; height: 94rpx; margin-bottom: 16rpx; border: 2rpx dashed #c7c0b5; border-radius: 50%; color: #817b72; font-size: 38rpx; font-weight: 300; }
+.recent-section { margin-top: 46rpx; }
+.recent-axis { position: relative; margin-left: 6rpx; padding-left: 48rpx; }
+.recent-axis::before { content: ''; position: absolute; left: 6rpx; top: 16rpx; bottom: 30rpx; width: 2rpx; background: #dedad3; }
+.recent-group + .recent-group { margin-top: 34rpx; }
+.group-label { position: relative; margin-bottom: 20rpx; color: #55514c; font-size: 24rpx; font-weight: 500; line-height: 1.5; }
+.date-node { position: absolute; left: -48rpx; top: 10rpx; width: 14rpx; height: 14rpx; border: 2rpx solid #9c958b; border-radius: 50%; background: #fdfcf9; box-shadow: 0 0 0 8rpx #fdfcf9; }
+.recent-row { position: relative; margin-bottom: 22rpx; }
+.recent-row:last-child { margin-bottom: 0; }
+.recent-marker { position: absolute; left: -46rpx; top: 20rpx; width: 10rpx; height: 10rpx; background: #c7c4bf; border-radius: 50%; box-shadow: 0 0 0 6rpx #fdfcf9; }
+.recent-item { display: block; width: 100%; min-height: 88rpx; padding: 6rpx 0; text-align: left; border-radius: 12rpx; }
+.recent-pressed { background: #f1eee8; }
+.recent-text { display: block; font-size: 30rpx; line-height: 1.6; color: #1d1d1f; overflow-wrap: anywhere; word-break: break-all; }
+.recent-impressions { margin-top: 14rpx; }
+.impression-line { color: #938c82; font-size: 23rpx; line-height: 1.65; overflow-wrap: anywhere; word-break: break-all; }
+.impression-line + .impression-line { margin-top: 6rpx; }
+.impression-name { color: #64615c; }
+.home-motto { margin-top: 44rpx; text-align: center; color: #aaa296; font-size: 20rpx; letter-spacing: 3rpx; }
+@media (max-width: 350px) { .hero-bottom { gap: 14rpx; } .hero-stats { gap: 16rpx; } .stat { gap: 6rpx; } .stat-number { font-size: 42rpx; } .quick { min-width: 164rpx; min-height: 84rpx; padding: 0 20rpx; } }

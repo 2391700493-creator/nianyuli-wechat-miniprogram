@@ -1,0 +1,51 @@
+page { background: #f2f0ed; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; font-size: 30rpx; }
+view, text, button, input, textarea { box-sizing: border-box; }
+button { margin: 0; padding: 0; border-radius: 0; background: transparent; color: inherit; font-size: inherit; line-height: inherit; }
+button::after { border: 0; }
+.page { min-height: 100vh; padding: 40rpx 40rpx 88rpx; }
+.hero { margin: 0 0 52rpx; }
+.hero-title { font-size: 50rpx; line-height: 1.28; font-weight: 600; letter-spacing: -1rpx; }
+.hero-desc { margin-top: 10rpx; color: #6e6e73; font-size: 28rpx; line-height: 1.45; }
+.section { margin-top: 52rpx; }
+.section-head { display: flex; justify-content: space-between; align-items: center; min-height: 48rpx; margin-bottom: 20rpx; }
+.section-title { font-size: 34rpx; font-weight: 600; letter-spacing: -.3rpx; }
+.section-link { color: #1d1d1f; font-size: 26rpx; font-weight: 500; padding: 8rpx 0 8rpx 16rpx; }
+.muted { color: #6e6e73; }
+.empty { padding: 56rpx 20rpx; color: #6e6e73; text-align: center; font-size: 27rpx; line-height: 1.5; }
+.timeline { position: relative; padding-left: 48rpx; }
+.timeline::before { content: ''; position: absolute; left: 14rpx; top: 20rpx; bottom: 20rpx; width: 2rpx; background: #d8d8da; }
+.timeline-item { position: relative; margin-bottom: 16rpx; }
+.timeline-dot { position: absolute; left: -43rpx; top: 18rpx; width: 22rpx; height: 22rpx; border: 4rpx solid #1d1d1f; border-radius: 50%; background: #fff; }
+.event { width: 100%; padding: 12rpx 16rpx 20rpx; text-align: left; border-radius: 24rpx; }
+.event:active { background: #f5f5f7; }
+.event-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx; }
+.event-date { color: #86868b; font-size: 24rpx; }
+.dots { display: flex; gap: 8rpx; }
+.dot { width: 12rpx; height: 12rpx; border-radius: 50%; background: #d2d2d7; }
+.dot.on { background: #1d1d1f; }
+.mood-badge { display: inline-flex; align-items: center; padding: 5rpx 14rpx; border-radius: 20rpx; background: #ededee; color: #555559; font-size: 22rpx; }
+.mood-dot { display: inline-block; width: 12rpx; height: 12rpx; border-radius: 50%; background: #c7c4bf; }
+.dot-happy { background: #3b6d11; }
+.dot-moved { background: #3b6d11; }
+.dot-calm { background: #4a7a6a; }
+.dot-sad { background: #a66e2e; }
+.dot-wronged { background: #a66e2e; }
+.dot-angry { background: #a33b2d; }
+.event-text { display: block; font-size: 30rpx; line-height: 1.52; }
+.chips { display: flex; gap: 10rpx; flex-wrap: wrap; margin-top: 16rpx; }
+.chip { padding: 8rpx 15rpx; background: #f3f3f3; border-radius: 99rpx; color: #424245; font-size: 22rpx; line-height: 1.2; }
+
+/* 心情色点（事件详情页读数用） */
+.seg-dot { flex: none; width: 20rpx; height: 20rpx; border-radius: 50%; border: 2rpx solid rgba(0,0,0,.08); }
+
+/* 加载失败重试按钮（全局） */
+.retry { margin: 24rpx auto 0; min-height: 76rpx; padding: 0 56rpx; border-radius: 12rpx; background: #1d1d1f; color: #fff; font-size: 28rpx; line-height: 76rpx; display: inline-block; }
+
+/* 按压仅改变透明度，避免原生按钮的矩形高亮。 */
+.button-pressed { opacity: .7; }
+button:focus { outline: none; }
+button:focus-visible { outline: 3rpx solid #817b72; outline-offset: 3rpx; }
+
+/* 原生输入与提示文字共用字体指标，单行输入避免继承多行行高。 */
+input { line-height: normal; }
+.text-entry-placeholder { font-family: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; letter-spacing: inherit; }

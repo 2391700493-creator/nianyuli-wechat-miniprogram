@@ -1,0 +1,47 @@
+.mm-overlay { position: fixed; inset: 0; z-index: 400; display: flex; align-items: flex-end; background: rgba(20,20,22,.5); }
+.mm-sheet { width: 100%; max-height: 84vh; padding: 20rpx 32rpx calc(24rpx + env(safe-area-inset-bottom)); border-radius: 32rpx 32rpx 0 0; background: #fff; box-shadow: 0 -8rpx 60rpx rgba(0,0,0,.16); }
+.mm-grabber { width: 72rpx; height: 8rpx; border-radius: 99rpx; background: rgba(0,0,0,.16); margin: 4rpx auto 20rpx; }
+.mm-head { display: flex; align-items: center; justify-content: space-between; min-height: 72rpx; }
+.mm-title { font-size: 34rpx; font-weight: 600; }
+.mm-count { margin-top: 6rpx; color: #77777c; font-size: 23rpx; }
+.mm-close { display: flex; align-items: center; justify-content: center; flex: none; width: 88rpx; height: 88rpx; margin: -8rpx -8rpx -8rpx 0; }
+.mm-close-icon { display: flex; align-items: center; justify-content: center; width: 56rpx; height: 56rpx; border-radius: 50%; background: #e9e9eb; font-size: 32rpx; line-height: 1; }
+.mm-close:active .mm-close-icon { background: #d8d8dc; }
+.mm-hint { margin: 16rpx 0 20rpx; color: #6e6e73; font-size: 23rpx; line-height: 1.55; }
+.mm-list { max-height: 540rpx; }
+.mm-row { display: flex; align-items: center; gap: 22rpx; padding: 14rpx 4rpx; }
+.mm-minus { display: flex; align-items: center; justify-content: center; flex: none; width: 44rpx; height: 44rpx; border-radius: 50%; background: #ff3b30; color: #fff; font-size: 30rpx; line-height: 1; }
+/* 色框：白底描边圆框，任何颜色都清晰 */
+.mm-dot { flex: none; width: 44rpx; height: 44rpx; border-radius: 50%; border: 4rpx solid #fff; box-shadow: 0 0 0 2rpx rgba(0,0,0,.18); background-clip: padding-box; }
+.mm-name { font-size: 28rpx; }
+.mm-palette { padding: 12rpx 4rpx 22rpx 66rpx; }
+.mm-palette-new { padding-left: 4rpx; }
+.mm-swatches { display: flex; flex-wrap: wrap; gap: 18rpx; }
+.mm-swatch { width: 52rpx; height: 52rpx; border-radius: 50%; border: 4rpx solid #fff; box-shadow: 0 0 0 2rpx rgba(0,0,0,.14); background-clip: padding-box; transition: transform 120ms ease-out; }
+.mm-swatch.on { box-shadow: 0 0 0 3rpx #fff, 0 0 0 6rpx #1d1d1f; transform: scale(1.06); }
+/* 三条微调滑块：拖动实时改色 */
+.mm-sliders { margin-top: 24rpx; }
+.mm-slider-row { display: flex; align-items: center; gap: 16rpx; height: 64rpx; }
+.mm-slider-label { flex: none; width: 68rpx; color: #86868b; font-size: 23rpx; }
+.mm-slider { flex: 1; margin: 0; }
+.mm-preview { display: flex; align-items: center; gap: 12rpx; margin-top: 12rpx; }
+.mm-preview-dot { width: 34rpx; height: 34rpx; border-radius: 50%; border: 3rpx solid #fff; box-shadow: 0 0 0 2rpx rgba(0,0,0,.16); background-clip: padding-box; }
+.mm-preview-hex { color: #a8a5a0; font-size: 22rpx; font-variant-numeric: tabular-nums; }
+.mm-add { display: flex; align-items: center; gap: 18rpx; margin-top: 12rpx; padding-top: 20rpx; border-top: 1rpx solid #e8e8ea; }
+.mm-add-input { flex: 1; min-width: 0; height: 80rpx; padding: 0 22rpx; border-radius: 16rpx; background: #f5f5f4; font-size: 26rpx; }
+.mm-add-btn { display: flex; align-items: center; justify-content: center; flex: none; min-width: 120rpx; height: 80rpx; border-radius: 16rpx; background: #1d1d1f; color: #fff; font-size: 26rpx; }
+.mm-done { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 88rpx; margin-top: 20rpx; border-radius: 16rpx; background: #1d1d1f; color: #fff; font-size: 27rpx; font-weight: 600; line-height: 1; }
+.mm-done:active { background: #353538; }
+.mm-pressed { transform: scale(0.96); }
+
+.mm-sync { display: flex; align-items: center; justify-content: space-between; padding: 12rpx 0; font-size: 24rpx; color: #817b72; }
+.mm-sync button { margin: 0; padding: 12rpx 20rpx; font-size: 24rpx; background: #eae5dc; border-radius: 12rpx; }
+
+.mm-minus, .mm-dot, .mm-swatch { margin: 0; padding: 0; box-sizing: border-box; }
+.mm-minus::after, .mm-dot::after, .mm-swatch::after { border: 0; }
+button:focus-visible { outline: 3rpx solid #817b72; outline-offset: 4rpx; }
+
+.button-pressed { opacity: .7; }
+
+input { line-height: normal; }
+.text-entry-placeholder { font-family: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; letter-spacing: inherit; }

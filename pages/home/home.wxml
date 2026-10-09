@@ -1,0 +1,52 @@
+<view class="home-page">
+  <view class="home-hero matte-black">
+    <view class="hero-eyebrow">一点记录，慢慢了解</view>
+    <view class="home-title"><view>把重要的人</view><view>留在生活里</view></view>
+    <view class="hero-bottom">
+      <view class="hero-stats"><view class="stat"><text class="stat-number">{{peopleCount}}</text><text>位人物</text></view><view class="stat-divider"></view><view class="stat"><text class="stat-number">{{eventCount}}</text><text>条记录</text></view></view>
+      <button class="quick" hover-class="quick-pressed" bindtap="record">记一件事</button>
+    </view>
+  </view>
+
+  <view class="home-sheet">
+    <view class="people-section">
+      <view class="section-head"><view class="section-title">最近相处的人</view><button hover-class="button-pressed" class="section-link" bindtap="allPeople">全部人物 ›</button></view>
+      <scroll-view class="people-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+        <view class="people-track">
+          <button wx:for="{{peopleCards}}" wx:key="id" class="person-card" hover-class="person-pressed" data-id="{{item.id}}" bindtap="openPerson" aria-label="{{item.name + '，' + item.count + '条记录'}}">
+            <view class="person-avatar-wrap">
+              <image wx:if="{{item.avatarUrl}}" class="person-avatar" src="{{item.avatarUrl}}" mode="aspectFill"/>
+              <view wx:else class="person-avatar">{{item.initial}}</view>
+              <view wx:if="{{item.ring}}" class="person-mood-dot" style="background:{{item.ring}}"></view>
+            </view>
+            <view class="person-name">{{item.name}}</view>
+            <view class="person-meta">{{item.count ? item.count + ' 条 · ' + item.lastText : '还没有记录'}}</view>
+          </button>
+          <button class="person-card person-add" hover-class="person-pressed" bindtap="addPerson"><view class="person-add-plus">＋</view><view class="person-name">添加人物</view></button>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="recent-section">
+      <view class="section-head"><view class="section-title">最近记录</view><button hover-class="button-pressed" class="section-link" bindtap="allRecords">全部记录 ›</button></view>
+      <view wx:if="{{loading}}" class="empty">加载中…</view>
+      <view wx:elif="{{loadFailed}}" class="empty">加载失败，请检查网络。<button hover-class="button-pressed" class="retry" bindtap="retryLoad">重试</button></view>
+      <view wx:elif="{{!groups.length}}" class="empty">还没有记录。点上方“记一件事”，留住第一件事。</view>
+      <view wx:else class="recent-axis">
+        <view wx:for="{{groups}}" wx:key="label" wx:for-item="group" class="recent-group">
+          <view class="group-label"><view class="date-node"></view>{{group.label}}</view>
+          <view wx:for="{{group.events}}" wx:key="id" wx:for-item="item" class="recent-row">
+            <view class="recent-marker" style="{{item.moodColor ? 'background:' + item.moodColor : ''}}"></view>
+            <button class="recent-item" hover-class="recent-pressed" data-id="{{item.id}}" bindtap="openEvent" aria-label="{{item.text + (item.mood ? '，心情：' + item.mood : '')}}">
+              <text class="recent-text">{{item.text}}</text>
+              <view class="recent-impressions">
+                <view wx:for="{{item.impressions}}" wx:key="id" wx:for-item="impression" class="impression-line"><text class="impression-name">{{impression.name}}：</text><text>{{impression.text}}</text></view>
+              </view>
+            </button>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="home-motto">把相处留在纸上</view>
+  </view>
+</view>

@@ -1,0 +1,5 @@
+/* 两页共享的细颗粒磨砂黑；无需图片下载。 */
+.matte-black {
+  background-color: #111214;
+  background-image: radial-gradient(ellipse at 75% 0%, rgba(255,255,255,.035), transparent 70%), repeating-linear-gradient(115deg, rgba(255,255,255,.012) 0, rgba(255,255,255,.012) 1px, transparent 1px, transparent 3px), repeating-linear-gradient(25deg, rgba(0,0,0,.045) 0, rgba(0,0,0,.045) 1px, transparent 1px, transparent 3px);
+}

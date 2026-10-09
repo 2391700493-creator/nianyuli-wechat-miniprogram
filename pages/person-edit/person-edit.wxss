@@ -1,0 +1,44 @@
+page { background: #fdfcfb; }
+.edit-page { padding: 32rpx 40rpx 0; }
+.edit-content {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 32rpx);
+}
+.portrait { display: flex; align-items: center; gap: 28rpx; padding: 12rpx 0 8rpx; }
+.avatar {
+  flex: none; width: 112rpx; height: 112rpx; border-radius: 50%;
+  background: #eee7df; color: #42403d;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44rpx; font-weight: 500;
+}
+.identity { flex: 1; min-width: 0; }
+.name-input { width: 100%; height: 64rpx; font-size: 40rpx; font-weight: 600; }
+.name-label { display: block; margin-top: 4rpx; font-size: 25rpx; color: #77777b; }
+.field-group { margin-top: 40rpx; }
+.group-heading {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 44rpx; margin-bottom: 8rpx;
+  color: #535357; font-size: 28rpx; font-weight: 500;
+}
+.optional { font-size: 24rpx; font-weight: 400; color: #77777b; }
+.field-row {
+  display: flex; align-items: center; min-height: 100rpx;
+  border-bottom: 1rpx solid #eae8e5;
+}
+.field-label { flex: none; width: 180rpx; padding-right: 16rpx; font-size: 26rpx; color: #77777b; }
+.field-input, .field-value { flex: 1; min-width: 0; color: #1d1d1f; font-size: 30rpx; text-align: left; }
+.field-input { height: 96rpx; padding: 0; }
+.field-value { padding: 24rpx 0; overflow-wrap: break-word; }
+.ph { color: #8a8885; }
+.chevron {
+  flex: none; width: 12rpx; height: 12rpx; margin: -6rpx 6rpx 0 20rpx;
+  border-right: 2rpx solid #8a8885; border-bottom: 2rpx solid #8a8885;
+  transform: rotate(45deg);
+}
+.note-field { margin-top: 32rpx; }
+.note-input { width: 100%; min-height: 92rpx; margin-top: 16rpx; padding: 8rpx 0; font-size: 30rpx; line-height: 1.4; color: #1d1d1f; }
+/* 短内容时落在页底，长内容随页面滚动，不遮挡键盘和备注。 */
+.save-area { margin-top: auto; padding: 40rpx 0 calc(24rpx + env(safe-area-inset-bottom)); }
+.save { width: 100%; min-height: 92rpx; padding: 24rpx; border-radius: 24rpx; background: #1d1d1f; color: #fff; font-size: 30rpx; line-height: 44rpx; font-weight: 500; }
+.save[disabled] { background: #86868b; color: #fff; }

@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/people/people",
+    "pages/person/person",
+    "pages/person-edit/person-edit",
+    "pages/record/record",
+    "pages/event/event",
+    "pages/all-records/all-records",
+    "pages/tags/tags"
+  ],
+  "window": {
+    "navigationBarTitleText": "念隅里",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f5f4"
+  },
+  "tabBar": {
+    "color": "#86868b",
+    "selectedColor": "#1d1d1f",
+    "backgroundColor": "#f5f5f4",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/all-records/all-records",
+        "text": "记录",
+        "iconPath": "assets/tab/records.png",
+        "selectedIconPath": "assets/tab/records-active.png"
+      },
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/tab/home.png",
+        "selectedIconPath": "assets/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/people/people",
+        "text": "人物",
+        "iconPath": "assets/tab/people.png",
+        "selectedIconPath": "assets/tab/people-active.png"
+      }
+    ],
+    "custom": true
+  },
+  "lazyCodeLoading": "requiredComponents"
+}
